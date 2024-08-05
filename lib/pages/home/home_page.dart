@@ -25,9 +25,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
-        leading: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: const Center(
+        leading: const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -43,9 +43,9 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         leadingWidth: 120,
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.only(right: 10),
+            padding: EdgeInsets.only(right: 10),
             child: Image(
               image: ExactAssetImage("assets/images/man.png", scale: 1.5),
             ),
@@ -55,9 +55,20 @@ class _HomePageState extends State<HomePage> {
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Autocomplete<String>(
+            child: Autocomplete<IngredientModel>(
               optionsBuilder: (textEditingValue) {
-                return [];
+                return [
+                  IngredientModel(id: 1, name: "ingredient 1"),
+                  IngredientModel(id: 2, name: "ingredient 2")
+                ];
+              },
+              displayStringForOption: (option) => option.name!,
+              optionsViewBuilder: (context, onSelected, options) {
+                return ListView.builder(
+                  itemCount: options.length,
+                  itemBuilder: (context, index) {
+                  return Text(options.elementAt(index).name!);
+                },);
               },
               initialValue: TextEditingValue.empty,
               fieldViewBuilder: (context, textEditingController, focusNode,
@@ -96,56 +107,57 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(height: 10),
               StreamBuilder<List<IngredientModel>>(
-                  stream: bloc.ingredientListStream,
-                  builder: (context, snapshot) {
-                    debugPrint("AAAAAAAAAAAAA");
-                    List<IngredientModel>? ingredients = snapshot.data;
-                    return GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 5,
-                        crossAxisSpacing: 5,
-                        mainAxisExtent: 120,
-                      ),
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics()),
-                      itemCount: ingredients?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        IngredientModel ingredient = ingredients![index];
-                        return InkWell(
-                          onTap: () => bloc.selectIngredient(index),
-                          child: Card(
-                            elevation: 3,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              side: BorderSide(
-                                width: ingredient.isSelected ? 5 : 0.1,
-                                color: ingredient.isSelected
-                                    ? Colors.blue
-                                    : Colors.transparent,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Expanded(
-                                    child: Image(
-                                      image: AssetImage(ingredient.imageUrl!),
-                                    ),
-                                  ),
-                                  Text(ingredient.name!)
-                                ],
-                              ),
+                stream: bloc.ingredientListStream,
+                builder: (context, snapshot) {
+                  // debugPrint("AAAAAAAAAAAAA");
+                  List<IngredientModel>? ingredients = snapshot.data;
+                  return GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 5,
+                      crossAxisSpacing: 5,
+                      mainAxisExtent: 120,
+                    ),
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    itemCount: ingredients?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      IngredientModel ingredient = ingredients![index];
+                      return InkWell(
+                        onTap: () => bloc.selectIngredient(index),
+                        child: Card(
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            side: BorderSide(
+                              width: ingredient.isSelected ? 5 : 0.1,
+                              color: ingredient.isSelected
+                                  ? Colors.blue
+                                  : Colors.transparent,
                             ),
                           ),
-                        );
-                      },
-                    );
-                  })
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Expanded(
+                                  child: Image(
+                                    image: AssetImage(ingredient.imageUrl!),
+                                  ),
+                                ),
+                                Text(ingredient.name!)
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              )
             ],
           ),
         ),
