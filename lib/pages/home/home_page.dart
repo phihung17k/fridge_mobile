@@ -14,10 +14,72 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late HomeBloc bloc;
 
+  late TextEditingController textEditingController;
+
+  final OverlayPortalController overlayPortalController =
+      OverlayPortalController();
+  final FocusNode focusNode = FocusNode();
+
+  final LayerLink layerLink = LayerLink();
+
+  late final ChipsInputEditingController inputController;
+  String _previousText = '';
+  TextSelection? _previousSelection;
+  List<IngredientModel> _toppings = [];
+
   @override
   void initState() {
     super.initState();
     bloc = GetIt.I.get<HomeBloc>();
+    textEditingController = TextEditingController();
+    inputController = ChipsInputEditingController([]);
+
+    inputController.addListener(_textListener);
+  }
+
+  void _textListener() {
+    final String currentText = inputController.text;
+
+    if (_previousSelection != null) {
+      final int currentNumber = countReplacements(currentText);
+      final int previousNumber = countReplacements(_previousText);
+
+      final int cursorEnd = _previousSelection!.extentOffset;
+      final int cursorStart = _previousSelection!.baseOffset;
+
+      final List<IngredientModel> values = [..._toppings];
+
+      // If the current number and the previous number of replacements are different, then
+      // the user has deleted the InputChip using the keyboard. In this case, we trigger
+      // the onChanged callback. We need to be sure also that the current number of
+      // replacements is different from the input chip to avoid double-deletion.
+      if (currentNumber < previousNumber && currentNumber != values.length) {
+        if (cursorStart == cursorEnd) {
+          values.removeRange(cursorStart - 1, cursorEnd);
+        } else {
+          if (cursorStart > cursorEnd) {
+            values.removeRange(cursorEnd, cursorStart);
+          } else {
+            values.removeRange(cursorStart, cursorEnd);
+          }
+        }
+        // widget.onChanged(values);
+        // bloc .add event
+        setState(() {
+          _toppings = values;
+        });
+      }
+    }
+
+    _previousText = currentText;
+    _previousSelection = inputController.selection;
+  }
+
+  static int countReplacements(String text) {
+    return text.codeUnits
+        .where(
+            (int u) => u == ChipsInputEditingController.kObjectReplacementChar)
+        .length;
   }
 
   @override
@@ -55,42 +117,83 @@ class _HomePageState extends State<HomePage> {
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Autocomplete<IngredientModel>(
-              optionsBuilder: (textEditingValue) {
-                return [
-                  IngredientModel(id: 1, name: "ingredient 1"),
-                  IngredientModel(id: 2, name: "ingredient 2")
-                ];
-              },
-              displayStringForOption: (option) => option.name!,
-              optionsViewBuilder: (context, onSelected, options) {
-                return ListView.builder(
-                  itemCount: options.length,
-                  itemBuilder: (context, index) {
-                  return Text(options.elementAt(index).name!);
-                },);
-              },
-              initialValue: TextEditingValue.empty,
-              fieldViewBuilder: (context, textEditingController, focusNode,
-                  onFieldSubmitted) {
-                return TextField(
-                  controller: textEditingController,
+            child: CompositedTransformTarget(
+              link: layerLink,
+              child: OverlayPortal(
+                controller: overlayPortalController,
+                overlayChildBuilder: (context) {
+                  double overlayWidth = MediaQuery.of(context).size.width;
+                  return CompositedTransformFollower(
+                    link: layerLink,
+                    targetAnchor: Alignment.bottomLeft,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: overlayWidth - 20,
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        color: Colors.amber,
+                        child: Material(
+                          elevation: 4.0,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: 2,
+                            itemBuilder: (BuildContext context, int index) {
+                              final IngredientModel item =
+                                  bloc.state.ingredients![index];
+                              Color? color;
+                              if (index == 0) {
+                                color = Theme.of(context).focusColor;
+                              }
+                              return InkWell(
+                                onTap: () {
+                                  // onSelected(item);
+                                  List<IngredientModel> tempList =
+                                      inputController.values.toList();
+                                  tempList.add(item);
+                                  inputController.updateValues(tempList);
+                                },
+                                child: Container(
+                                  color: color,
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Text(item.name!),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: TextField(
+                  controller: inputController,
+                  minLines: 1,
+                  maxLines: 3,
                   focusNode: focusNode,
-                  onEditingComplete: onFieldSubmitted,
-                  onTapOutside: (event) => focusNode.unfocus(),
+                  // onEditingComplete: onFieldSubmitted,
+                  onTapOutside: (event) {
+                    focusNode.unfocus();
+                    // overlayPortalController.hide();
+                  },
+                  onChanged: (value) {
+                    value == ''
+                        ? overlayPortalController.hide()
+                        : overlayPortalController.show();
+                  },
+                  onTap: () {},
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey),
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
-                    suffixIcon: Icon(
+                    suffixIcon: const Icon(
                       Icons.tune_rounded,
                       color: Colors.grey,
                     ),
                     hintText: "Find ingredient",
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
@@ -161,6 +264,106 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ChipsInputEditingController extends TextEditingController {
+  ChipsInputEditingController(this.values)
+      : super(
+          text: String.fromCharCode(kObjectReplacementChar) * values.length,
+        );
+
+  // This constant character acts as a placeholder in the TextField text value.
+  // There will be one character for each of the InputChip displayed.
+  static const int kObjectReplacementChar = 0xFFFE;
+
+  List<IngredientModel> values;
+
+  /// Called whenever chip is either added or removed
+  /// from the outside the context of the text field.
+  void updateValues(List<IngredientModel> values) {
+    if (values.length != this.values.length) {
+      final String char = String.fromCharCode(kObjectReplacementChar);
+      final int length = values.length;
+      value = TextEditingValue(
+        text: char * length,
+        selection: TextSelection.collapsed(offset: length),
+      );
+      this.values = values;
+    }
+  }
+
+  String get textWithoutReplacements {
+    final String char = String.fromCharCode(kObjectReplacementChar);
+    return text.replaceAll(RegExp(char), '');
+  }
+
+  String get textWithReplacements => text;
+
+  @override
+  TextSpan buildTextSpan(
+      {required BuildContext context,
+      TextStyle? style,
+      required bool withComposing}) {
+    List<WidgetSpan> chipWidgets = [];
+    for (var i = 0; i < values.length; i++) {
+      chipWidgets.add(WidgetSpan(
+          child: ToppingInputChip(
+        topping: values[i].name!,
+        onDeleted: (_) {
+          // setState(() {
+          //   _toppings.remove(value);
+          //   _suggestions = <String>[];
+          //   debugPrint(
+          //       "ToppingInputChip AAAAAAAAAAAAAA" + _toppings.join(', '));
+          // });
+          List<IngredientModel> tempList = values.toList();
+          tempList.removeAt(i);
+          updateValues(tempList);
+        },
+        onSelected: (value) {},
+      )));
+    }
+
+    return TextSpan(
+      style: style,
+      children: <InlineSpan>[
+        ...chipWidgets,
+        if (textWithoutReplacements.isNotEmpty)
+          TextSpan(text: textWithoutReplacements)
+      ],
+    );
+  }
+}
+
+class ToppingInputChip extends StatelessWidget {
+  const ToppingInputChip({
+    super.key,
+    required this.topping,
+    required this.onDeleted,
+    required this.onSelected,
+  });
+
+  final String topping;
+  final ValueChanged<String> onDeleted;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 3),
+      child: InputChip(
+        key: ObjectKey(topping),
+        label: Text(topping),
+        avatar: CircleAvatar(
+          child: Text(topping[0].toUpperCase()),
+        ),
+        onDeleted: () => onDeleted(topping),
+        onSelected: (bool value) => onSelected(topping),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: const EdgeInsets.all(2),
       ),
     );
   }
