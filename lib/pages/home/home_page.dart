@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fridge_mobile/models/ingredient_model.dart';
+import 'package:fridge_mobile/utils/string_extension.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../blocs/home/home_bloc.dart';
@@ -77,8 +78,7 @@ class _HomePageState extends State<HomePage> {
 
   static int countReplacements(String text) {
     return text.codeUnits
-        .where(
-            (int u) => u == ChipsInputEditingController.kObjectReplacementChar)
+        .where((int u) => u == StringConstant.replacementChar)
         .length;
   }
 
@@ -122,44 +122,50 @@ class _HomePageState extends State<HomePage> {
               child: OverlayPortal(
                 controller: overlayPortalController,
                 overlayChildBuilder: (context) {
-                  double overlayWidth = MediaQuery.of(context).size.width;
-                  return CompositedTransformFollower(
-                    link: layerLink,
-                    targetAnchor: Alignment.bottomLeft,
-                    child: Align(
-                      alignment: Alignment.topLeft,
+                  double overlayWidth = MediaQuery.sizeOf(context).width;
+                  return Positioned(
+                    width: overlayWidth - 20,
+                    child: CompositedTransformFollower(
+                      link: layerLink,
+                      targetAnchor: Alignment.bottomLeft,
                       child: Container(
-                        width: overlayWidth - 20,
                         constraints: const BoxConstraints(maxHeight: 200),
-                        color: Colors.amber,
-                        child: Material(
-                          elevation: 4.0,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: 2,
-                            itemBuilder: (BuildContext context, int index) {
-                              final IngredientModel item =
-                                  bloc.state.ingredients![index];
-                              Color? color;
-                              if (index == 0) {
-                                color = Theme.of(context).focusColor;
-                              }
-                              return InkWell(
-                                onTap: () {
-                                  // onSelected(item);
-                                  List<IngredientModel> tempList =
-                                      inputController.values.toList();
-                                  tempList.add(item);
-                                  inputController.updateValues(tempList);
-                                },
-                                child: Container(
-                                  color: color,
-                                  padding: const EdgeInsets.all(15.0),
-                                  child: Text(item.name!),
-                                ),
-                              );
-                            },
-                          ),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey,
+                              spreadRadius: 0.1,
+                              blurRadius: 10,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: 2,
+                          itemBuilder: (BuildContext context, int index) {
+                            final IngredientModel item =
+                                bloc.state.ingredients![index];
+                            Color? color;
+                            if (index == 0) {
+                              color = Theme.of(context).focusColor;
+                            }
+                            return InkWell(
+                              onTap: () {
+                                // onSelected(item);
+                                List<IngredientModel> tempList =
+                                    inputController.values.toList();
+                                tempList.add(item);
+                                inputController.updateValues(tempList);
+                              },
+                              child: Container(
+                                color: color,
+                                padding: const EdgeInsets.all(15.0),
+                                child: Text(item.name!),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -272,12 +278,8 @@ class _HomePageState extends State<HomePage> {
 class ChipsInputEditingController extends TextEditingController {
   ChipsInputEditingController(this.values)
       : super(
-          text: String.fromCharCode(kObjectReplacementChar) * values.length,
+          text: StringConstant.replacementString * values.length,
         );
-
-  // This constant character acts as a placeholder in the TextField text value.
-  // There will be one character for each of the InputChip displayed.
-  static const int kObjectReplacementChar = 0xFFFE;
 
   List<IngredientModel> values;
 
@@ -285,10 +287,9 @@ class ChipsInputEditingController extends TextEditingController {
   /// from the outside the context of the text field.
   void updateValues(List<IngredientModel> values) {
     if (values.length != this.values.length) {
-      final String char = String.fromCharCode(kObjectReplacementChar);
       final int length = values.length;
       value = TextEditingValue(
-        text: char * length,
+        text: StringConstant.replacementString * length,
         selection: TextSelection.collapsed(offset: length),
       );
       this.values = values;
@@ -296,8 +297,7 @@ class ChipsInputEditingController extends TextEditingController {
   }
 
   String get textWithoutReplacements {
-    final String char = String.fromCharCode(kObjectReplacementChar);
-    return text.replaceAll(RegExp(char), '');
+    return text.replaceAll(RegExp(StringConstant.replacementString), '');
   }
 
   String get textWithReplacements => text;
