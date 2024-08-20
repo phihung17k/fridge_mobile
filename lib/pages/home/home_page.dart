@@ -17,8 +17,7 @@ class _HomePageState extends State<HomePage> {
 
   late TextEditingController textEditingController;
 
-  final OverlayPortalController overlayPortalController =
-      OverlayPortalController();
+  final OverlayPortalController overlayPortalController = OverlayPortalController();
   final FocusNode focusNode = FocusNode();
 
   final LayerLink layerLink = LayerLink();
@@ -33,9 +32,15 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     bloc = GetIt.I.get<HomeBloc>();
     textEditingController = TextEditingController();
-    inputController = ChipsInputEditingController([]);
+    inputController = ChipsInputEditingController(_toppings);
 
-    inputController.addListener(_textListener);
+    bloc.loadIngredients();
+
+    inputController.addListener(
+      () {
+        // String currentText = inputController.text;
+      },
+    );
   }
 
   void _textListener() {
@@ -77,9 +82,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   static int countReplacements(String text) {
-    return text.codeUnits
-        .where((int u) => u == StringConstant.replacementChar)
-        .length;
+    return text.codeUnits.where((int u) => u == StringConstant.replacementChar).length;
   }
 
   @override
@@ -141,32 +144,44 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ],
                         ),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: 2,
-                          itemBuilder: (BuildContext context, int index) {
-                            final IngredientModel item =
-                                bloc.state.ingredients![index];
-                            Color? color;
-                            if (index == 0) {
-                              color = Theme.of(context).focusColor;
-                            }
-                            return InkWell(
-                              onTap: () {
-                                // onSelected(item);
-                                List<IngredientModel> tempList =
-                                    inputController.values.toList();
-                                tempList.add(item);
-                                inputController.updateValues(tempList);
-                              },
-                              child: Container(
-                                color: color,
-                                padding: const EdgeInsets.all(15.0),
-                                child: Text(item.name!),
-                              ),
-                            );
-                          },
-                        ),
+                        child: StreamBuilder<List<IngredientModel>>(
+                            stream: bloc.optionsStream,
+                            builder: (context, snapshot) {
+                              List<IngredientModel> options = snapshot.data ?? [];
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: options.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final IngredientModel option = options[index];
+                                  Color? color;
+                                  if (index == 0) {
+                                    color = Theme.of(context).focusColor;
+                                  }
+                                  return InkWell(
+                                    onTap: () {
+                                      // onSelected(item);
+                                      // List<IngredientModel> tempList =
+                                      //     inputController.values.toList();
+                                      // tempList.add(item);
+                                      // inputController.updateValues(tempList);
+                                      inputController.values.add(option);
+                                      int length = inputController.values.length;
+                                      inputController.value = TextEditingValue(
+                                        text: StringConstant.replacementString * length,
+                                        selection: TextSelection.collapsed(offset: length),
+                                      );
+                                      overlayPortalController.hide();
+                                      bloc.removeSelectedOption(option);
+                                    },
+                                    child: Container(
+                                      color: color,
+                                      padding: const EdgeInsets.all(15.0),
+                                      child: Text(option.name!),
+                                    ),
+                                  );
+                                },
+                              );
+                            }),
                       ),
                     ),
                   );
@@ -182,9 +197,23 @@ class _HomePageState extends State<HomePage> {
                     // overlayPortalController.hide();
                   },
                   onChanged: (value) {
-                    value == ''
-                        ? overlayPortalController.hide()
-                        : overlayPortalController.show();
+                    if (value.trim().isEmpty) {
+                      overlayPortalController.hide();
+                      return;
+                    }
+
+                    String textWithoutReplacements =
+                        inputController.textWithoutReplacements.trim().toLowerCase();
+                    // if (bloc.state.options!.any(
+                    //     (item) => item.name!.toLowerCase().contains(textWithoutReplacements))) {
+                    //   overlayPortalController.show();
+                    // } else {
+                    //   overlayPortalController.hide();
+                    // }
+                    bloc.filterOptions(textWithoutReplacements);
+                    bloc.state.options!.isNotEmpty
+                        ? overlayPortalController.show()
+                        : overlayPortalController.hide();
                   },
                   onTap: () {},
                   decoration: InputDecoration(
@@ -214,23 +243,20 @@ class _HomePageState extends State<HomePage> {
                 "Ingredients",
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               StreamBuilder<List<IngredientModel>>(
                 stream: bloc.ingredientListStream,
                 builder: (context, snapshot) {
-                  // debugPrint("AAAAAAAAAAAAA");
                   List<IngredientModel>? ingredients = snapshot.data;
                   return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       mainAxisSpacing: 5,
                       crossAxisSpacing: 5,
                       mainAxisExtent: 120,
                     ),
                     shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics()),
+                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                     itemCount: ingredients?.length ?? 0,
                     itemBuilder: (context, index) {
                       IngredientModel ingredient = ingredients![index];
@@ -242,9 +268,7 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(15),
                             side: BorderSide(
                               width: ingredient.isSelected ? 5 : 0.1,
-                              color: ingredient.isSelected
-                                  ? Colors.blue
-                                  : Colors.transparent,
+                              color: ingredient.isSelected ? Colors.blue : Colors.transparent,
                             ),
                           ),
                           child: Padding(
@@ -304,37 +328,38 @@ class ChipsInputEditingController extends TextEditingController {
 
   @override
   TextSpan buildTextSpan(
-      {required BuildContext context,
-      TextStyle? style,
-      required bool withComposing}) {
-    List<WidgetSpan> chipWidgets = [];
-    for (var i = 0; i < values.length; i++) {
-      chipWidgets.add(WidgetSpan(
-          child: ToppingInputChip(
-        topping: values[i].name!,
-        onDeleted: (_) {
-          // setState(() {
-          //   _toppings.remove(value);
-          //   _suggestions = <String>[];
-          //   debugPrint(
-          //       "ToppingInputChip AAAAAAAAAAAAAA" + _toppings.join(', '));
-          // });
-          List<IngredientModel> tempList = values.toList();
-          tempList.removeAt(i);
-          updateValues(tempList);
-        },
-        onSelected: (value) {},
-      )));
-    }
+      {required BuildContext context, TextStyle? style, required bool withComposing}) {
+    return super.buildTextSpan(context: context, withComposing: withComposing);
 
-    return TextSpan(
-      style: style,
-      children: <InlineSpan>[
-        ...chipWidgets,
-        if (textWithoutReplacements.isNotEmpty)
-          TextSpan(text: textWithoutReplacements)
-      ],
-    );
+    // List<WidgetSpan> chipWidgets = [];
+    // for (var i = 0; i < values.length; i++) {
+    //   chipWidgets.add(WidgetSpan(
+    //     child: ToppingInputChip(
+    //       topping: values[i].name!,
+    //       onDeleted: (_) {
+    //         // setState(() {
+    //         //   _toppings.remove(value);
+    //         //   _suggestions = <String>[];
+    //         //   debugPrint(
+    //         //       "ToppingInputChip AAAAAAAAAAAAAA" + _toppings.join(', '));
+    //         // });
+    //         List<IngredientModel> tempList = values.toList();
+    //         tempList.removeAt(i);
+    //         updateValues(tempList);
+    //       },
+    //       onSelected: (value) {},
+    //     ),
+    //   ));
+    // }
+
+    // return TextSpan(
+    //   style: style,
+    //   children: <InlineSpan>[
+    //     ...chipWidgets,
+    //     if (textWithoutReplacements.isNotEmpty)
+    //       TextSpan(text: textWithoutReplacements)
+    //   ],
+    // );
   }
 }
 
