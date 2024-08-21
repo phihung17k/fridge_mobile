@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fridge_mobile/models/ingredient_model.dart';
 import 'package:fridge_mobile/utils/string_extension.dart';
 import 'package:get_it/get_it.dart';
@@ -23,8 +24,7 @@ class _HomePageState extends State<HomePage> {
   final LayerLink layerLink = LayerLink();
 
   late final ChipsInputEditingController inputController;
-  String _previousText = '';
-  TextSelection? _previousSelection;
+  // TextSelection? _previousSelection;
   List<IngredientModel> _toppings = [];
 
   @override
@@ -38,52 +38,80 @@ class _HomePageState extends State<HomePage> {
 
     inputController.addListener(
       () {
-        // String currentText = inputController.text;
+        // inputController.text.runes.forEach((rune) {
+        //   var character = String.fromCharCode(rune);
+        //   debugPrint(character);
+        // });
+        // case remove text
+        if (inputController.previousTextLength > inputController.textLength) {
+          // the removed character is replacementChar
+          if (inputController.values.length > inputController.numberOfReplacements) {
+            // determine the selected char's position cursor
+            // abc|d => ab|d meaning position 3 => 2
+
+            // count replacements in [previousText] from cursor => map to ingredients [values]
+            // ex: position 3 (�b�|�) -> 2 (�b|�) => the second ingredient is removed in [values]
+            String cursorPreviousText = inputController.previousText
+                .substring(0, inputController.previousSelection.baseOffset);
+            int previousNumberOfReplacements =
+                inputController.countReplacements(cursorPreviousText);
+
+            String cursorText =
+                inputController.text.substring(0, inputController.selection.baseOffset);
+            int numberOfReplacements = inputController.countReplacements(cursorText);
+
+            List<IngredientModel> removedReplacements = inputController.values
+                .getRange(numberOfReplacements, previousNumberOfReplacements)
+                .toList();
+            inputController.values.removeRange(numberOfReplacements, previousNumberOfReplacements);
+
+            bloc.restoreOption(removedReplacements);
+          }
+        }
+
+        inputController.previousText = inputController.text;
+        inputController.previousSelection = inputController.selection;
       },
     );
   }
 
-  void _textListener() {
-    final String currentText = inputController.text;
+  // void _textListener() {
+  //   final String currentText = inputController.text;
 
-    if (_previousSelection != null) {
-      final int currentNumber = countReplacements(currentText);
-      final int previousNumber = countReplacements(_previousText);
+  //   if (_previousSelection != null) {
+  //     final int currentNumber = countReplacements(currentText);
+  //     final int previousNumber = countReplacements(_previousText);
 
-      final int cursorEnd = _previousSelection!.extentOffset;
-      final int cursorStart = _previousSelection!.baseOffset;
+  //     final int cursorEnd = _previousSelection!.extentOffset;
+  //     final int cursorStart = _previousSelection!.baseOffset;
 
-      final List<IngredientModel> values = [..._toppings];
+  //     final List<IngredientModel> values = [..._toppings];
 
-      // If the current number and the previous number of replacements are different, then
-      // the user has deleted the InputChip using the keyboard. In this case, we trigger
-      // the onChanged callback. We need to be sure also that the current number of
-      // replacements is different from the input chip to avoid double-deletion.
-      if (currentNumber < previousNumber && currentNumber != values.length) {
-        if (cursorStart == cursorEnd) {
-          values.removeRange(cursorStart - 1, cursorEnd);
-        } else {
-          if (cursorStart > cursorEnd) {
-            values.removeRange(cursorEnd, cursorStart);
-          } else {
-            values.removeRange(cursorStart, cursorEnd);
-          }
-        }
-        // widget.onChanged(values);
-        // bloc .add event
-        setState(() {
-          _toppings = values;
-        });
-      }
-    }
+  //     // If the current number and the previous number of replacements are different, then
+  //     // the user has deleted the InputChip using the keyboard. In this case, we trigger
+  //     // the onChanged callback. We need to be sure also that the current number of
+  //     // replacements is different from the input chip to avoid double-deletion.
+  //     if (currentNumber < previousNumber && currentNumber != values.length) {
+  //       if (cursorStart == cursorEnd) {
+  //         values.removeRange(cursorStart - 1, cursorEnd);
+  //       } else {
+  //         if (cursorStart > cursorEnd) {
+  //           values.removeRange(cursorEnd, cursorStart);
+  //         } else {
+  //           values.removeRange(cursorStart, cursorEnd);
+  //         }
+  //       }
+  //       // widget.onChanged(values);
+  //       // bloc .add event
+  //       setState(() {
+  //         _toppings = values;
+  //       });
+  //     }
+  //   }
 
-    _previousText = currentText;
-    _previousSelection = inputController.selection;
-  }
-
-  static int countReplacements(String text) {
-    return text.codeUnits.where((int u) => u == StringConstant.replacementChar).length;
-  }
+  //   _previousText = currentText;
+  //   _previousSelection = inputController.selection;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -202,18 +230,15 @@ class _HomePageState extends State<HomePage> {
                       return;
                     }
 
+                    // show overlay option
                     String textWithoutReplacements =
                         inputController.textWithoutReplacements.trim().toLowerCase();
-                    // if (bloc.state.options!.any(
-                    //     (item) => item.name!.toLowerCase().contains(textWithoutReplacements))) {
-                    //   overlayPortalController.show();
-                    // } else {
-                    //   overlayPortalController.hide();
-                    // }
                     bloc.filterOptions(textWithoutReplacements);
                     bloc.state.options!.isNotEmpty
                         ? overlayPortalController.show()
                         : overlayPortalController.hide();
+
+                    // listener
                   },
                   onTap: () {},
                   decoration: InputDecoration(
@@ -300,12 +325,30 @@ class _HomePageState extends State<HomePage> {
 }
 
 class ChipsInputEditingController extends TextEditingController {
-  ChipsInputEditingController(this.values)
-      : super(
-          text: StringConstant.replacementString * values.length,
-        );
+  ChipsInputEditingController(
+    this.values, {
+    this.previousSelection = const TextSelection.collapsed(offset: 0),
+    this.previousText = '',
+  }) : super(text: StringConstant.replacementString * values.length);
 
   List<IngredientModel> values;
+
+  String previousText;
+  TextSelection previousSelection;
+
+  int get previousTextLength => previousText.length;
+  int get textLength => text.length;
+
+  String get textWithoutReplacements {
+    return text.replaceAll(RegExp(StringConstant.replacementString), '');
+  }
+
+  String get textWithReplacements => text;
+  int get numberOfReplacements => countReplacements(text);
+
+  int countReplacements(String text) {
+    return text.codeUnits.where((int u) => u == StringConstant.replacementChar).length;
+  }
 
   /// Called whenever chip is either added or removed
   /// from the outside the context of the text field.
@@ -320,16 +363,29 @@ class ChipsInputEditingController extends TextEditingController {
     }
   }
 
-  String get textWithoutReplacements {
-    return text.replaceAll(RegExp(StringConstant.replacementString), '');
-  }
-
-  String get textWithReplacements => text;
-
   @override
   TextSpan buildTextSpan(
       {required BuildContext context, TextStyle? style, required bool withComposing}) {
-    return super.buildTextSpan(context: context, withComposing: withComposing);
+    // return super.buildTextSpan(context: context, withComposing: withComposing);
+
+    List<InlineSpan> inlineSpans = [];
+    int indexIngredient = 0;
+    for (int i = 0; i < text.codeUnits.length; i++) {
+      int code = text.codeUnits[i];
+      // 65534 is code of replacement character
+      if (code == 65534) {
+        IngredientModel ingredient = values[indexIngredient++];
+        inlineSpans.add(WidgetSpan(
+            child: ToppingInputChip(
+          topping: ingredient.name!,
+          onDeleted: (value) {},
+        )));
+      } else {
+        inlineSpans.add(TextSpan(text: String.fromCharCode(code)));
+      }
+    }
+
+    return TextSpan(style: style, children: inlineSpans);
 
     // List<WidgetSpan> chipWidgets = [];
     // for (var i = 0; i < values.length; i++) {
@@ -368,12 +424,12 @@ class ToppingInputChip extends StatelessWidget {
     super.key,
     required this.topping,
     required this.onDeleted,
-    required this.onSelected,
+    // required this.onSelected,
   });
 
   final String topping;
   final ValueChanged<String> onDeleted;
-  final ValueChanged<String> onSelected;
+  // final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -386,7 +442,7 @@ class ToppingInputChip extends StatelessWidget {
           child: Text(topping[0].toUpperCase()),
         ),
         onDeleted: () => onDeleted(topping),
-        onSelected: (bool value) => onSelected(topping),
+        // onSelected: (bool value) => onSelected(topping),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: const EdgeInsets.all(2),
       ),

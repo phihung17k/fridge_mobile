@@ -50,4 +50,10 @@ class HomeBloc extends BaseBloc<HomeState> {
     options.remove(option);
     emit(state.copyWith(remainingOptions: options));
   }
+
+  void restoreOption(List<IngredientModel> addedOptions) {
+    List<IngredientModel> options = state.remainingOptions!.toList();
+    options.addAll(addedOptions);
+    emit(state.copyWith(remainingOptions: options));
+  }
 }
