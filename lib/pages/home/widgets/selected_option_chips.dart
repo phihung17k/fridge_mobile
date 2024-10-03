@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_mobile/pages/home/widgets/option_chip.dart';
 import '../../../blocs/bloc_provider.dart';
 import '../../../blocs/home/home_bloc.dart';
 import '../../../models/ingredient_model.dart';
-import '../../../utils/app_color.dart';
 
 class SelectedOptionChips extends StatelessWidget {
   const SelectedOptionChips({super.key});
@@ -22,15 +22,8 @@ class SelectedOptionChips extends StatelessWidget {
               children: List.generate(
                 ingredients.length,
                 (index) {
-                  return Chip(
-                    label: Text(ingredients[index].name!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: const BorderSide(color: Colors.grey),
-                    ),
-                    backgroundColor: AppColor.chipColor,
-                    onDeleted: () => bloc?.restoreOption(ingredients[index]),
-                  );
+                  return OptionChip(
+                      key: ValueKey(ingredients[index].id), ingredient: ingredients[index]);
                 },
               ),
             );
