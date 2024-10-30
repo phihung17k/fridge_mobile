@@ -28,43 +28,55 @@ class _HomePageState extends BaseState<HomePage, HomeBloc> {
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 70,
-          leading: const Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Good morning"),
-                  Text(
-                    "ABC",
-                    textScaler: TextScaler.linear(1.5),
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
+          leading: const Image(
+            image: ExactAssetImage("assets/images/man.png", scale: 1.5),
           ),
-          leadingWidth: 120,
-          actions: const [
-            Padding(
-              padding: EdgeInsets.only(right: 10),
-              child: Image(
-                image: ExactAssetImage("assets/images/man.png", scale: 1.5),
+          title: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Good morning"),
+              Text(
+                "ABC",
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications_outlined),
+              onPressed: () {},
             )
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top: 20, right: 10, bottom: 0, left: 10),
+          padding: const EdgeInsets.only(top: 10, right: 10, bottom: 0, left: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IngredientTextField(),
-              const SelectedOptionChips(),
-              const Expanded(
-                child: HomeBodyWidget(),
-              )
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Cookbooks",
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const Text("1/3")
+                ],
+              ),
+              Card(
+                color: Colors.white,
+                child: Container(
+                  width: double.maxFinite,
+                  height: 200,
+                  child: Column(
+                    children: [],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
