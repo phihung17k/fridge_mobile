@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 class Routes {
   static String get splash => "/";
   static String get home => "home";
+  static String get choosingIngredient => "choosingIngredient";
 
   static MaterialPageRoute getRoutes(RouteSettings settings) {
     Widget widget;
