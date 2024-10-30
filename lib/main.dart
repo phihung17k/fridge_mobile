@@ -9,7 +9,7 @@ void main() {
   runApp(MaterialApp(
     title: "Fridge",
     debugShowCheckedModeBanner: false,
-    initialRoute: Routes.home,
+    initialRoute: Routes.choosingIngredient,
     onGenerateRoute: (settings) => Routes.getRoutes(settings),
     theme: ThemeData(useMaterial3: true),
     // navigatorObservers: [],
