@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fridge_mobile/blocs/base_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-import 'loading_widget.dart';
+import '../animations/loading_widget.dart';
 
 abstract class BaseState<T extends StatefulWidget, B extends BaseBloc> extends State<T> {
   late final B bloc;
