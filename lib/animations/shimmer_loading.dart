@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'sliding_gradient_transform.dart';
@@ -28,16 +29,29 @@ class _ShimmerLoadingState extends State<ShimmerLoading> with TickerProviderStat
         vsync: this,
         lowerBound: -0.5,
         upperBound: 0.9,
-        duration: const Duration(milliseconds: 2500))
+        duration: const Duration(milliseconds: 2000))
       ..repeat();
 
-    fadeController = AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    fadeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+
+    fadeController.addStatusListener((status) {
+      if (status == AnimationStatus.forward) {
+        shimmerController.dispose();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ShimmerLoading oldWidget) {
+    if (!widget.isLoading && widget.isLoading != oldWidget.isLoading) {
+      fadeController.forward();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
   Widget build(BuildContext context) {
     if (!widget.isLoading) {
-      fadeController.forward();
       return FadeTransition(
         opacity: fadeController,
         child: widget.child,
@@ -79,7 +93,7 @@ class _ShimmerLoadingState extends State<ShimmerLoading> with TickerProviderStat
 
   @override
   void dispose() {
-    shimmerController.dispose();
+    // shimmerController.dispose();
     fadeController.dispose();
     super.dispose();
   }
