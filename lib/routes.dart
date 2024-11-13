@@ -3,8 +3,12 @@ import 'package:get_it/get_it.dart';
 
 class Routes {
   static String get splash => "/";
+  static String get main => "main";
   static String get home => "home";
-  static String get choosingIngredient => "choosingIngredient";
+  static String get cooking => "cook";
+  static String get saved => "saved";
+  static String get recipe => "recipe";
+  static String get profile => "profile";
 
   static MaterialPageRoute getRoutes(RouteSettings settings) {
     Widget widget;
