@@ -26,7 +26,7 @@ class _MainPageState extends BaseState<MainPage, HomeBloc> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
+    _pageController = PageController(initialPage: 1);
   }
 
   @override
@@ -34,18 +34,15 @@ class _MainPageState extends BaseState<MainPage, HomeBloc> {
     return BlocProvider(
       bloc: bloc,
       child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: PageView(
-            controller: _pageController,
-            children: [
-              GetIt.I.get<Widget>(instanceName: Routes.home),
-              GetIt.I.get<Widget>(instanceName: Routes.cooking),
-              GetIt.I.get<Widget>(instanceName: Routes.saved),
-              GetIt.I.get<Widget>(instanceName: Routes.recipe),
-              GetIt.I.get<Widget>(instanceName: Routes.profile),
-            ],
-          ),
+        body: PageView(
+          controller: _pageController,
+          children: [
+            GetIt.I.get<Widget>(instanceName: Routes.home),
+            GetIt.I.get<Widget>(instanceName: Routes.cooking),
+            GetIt.I.get<Widget>(instanceName: Routes.saved),
+            GetIt.I.get<Widget>(instanceName: Routes.recipe),
+            GetIt.I.get<Widget>(instanceName: Routes.profile),
+          ],
         ),
         bottomNavigationBar: ClipRRect(
           borderRadius: const BorderRadius.only(

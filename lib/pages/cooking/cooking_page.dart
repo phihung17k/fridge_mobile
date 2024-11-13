@@ -11,9 +11,15 @@ class _CookingPageState extends State<CookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Container(
-        child: Text("Cooking Page"),
+      appBar: AppBar(
+        title: Text("Choose Ingredient"),
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          children: [Text("Category")],
+        ),
       ),
     );
   }
