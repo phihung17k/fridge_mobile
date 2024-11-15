@@ -10,6 +10,9 @@ class Routes {
   static String get recipe => "recipe";
   static String get profile => "profile";
 
+  static String get selectingIngredient => "selecting_ingredient";
+  static String get foundRecipes => "found_recipes";
+
   static MaterialPageRoute getRoutes(RouteSettings settings) {
     Widget widget;
     try {

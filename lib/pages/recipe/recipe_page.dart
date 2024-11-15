@@ -10,8 +10,6 @@ class RecipePage extends StatefulWidget {
 class _RecipePageState extends State<RecipePage> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text("Recipe Page"),
-    );
+    return const Text("Recipe Page");
   }
 }

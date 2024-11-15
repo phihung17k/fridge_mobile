@@ -11,5 +11,9 @@ class PageDependencies {
     injector.registerFactory<Widget>(() => const SavedPage(), instanceName: Routes.saved);
     injector.registerFactory<Widget>(() => const RecipePage(), instanceName: Routes.recipe);
     injector.registerFactory<Widget>(() => const ProfilePage(), instanceName: Routes.profile);
+    injector.registerFactory<Widget>(() => const SelectedIngredientPage(),
+        instanceName: Routes.selectingIngredient);
+    injector.registerFactory<Widget>(() => const FoundRecipesPage(),
+        instanceName: Routes.foundRecipes);
   }
 }

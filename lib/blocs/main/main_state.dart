@@ -4,7 +4,7 @@ class MainState extends Equatable {
   const MainState();
 
   MainState copyWith() {
-    return MainState();
+    return const MainState();
   }
 
   @override

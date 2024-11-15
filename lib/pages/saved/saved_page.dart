@@ -10,8 +10,6 @@ class SavedPage extends StatefulWidget {
 class _SavedPageState extends State<SavedPage> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text("Saved Page"),
-    );
+    return const Text("Saved Page");
   }
 }

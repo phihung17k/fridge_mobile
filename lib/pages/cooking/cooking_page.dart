@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_mobile/routes.dart';
 import '../../models/ingredient_model.dart';
 import 'badge_count.dart';
 
@@ -29,7 +30,7 @@ class _CookingPageState extends State<CookingPage> with SingleTickerProviderStat
         forceMaterialTransparency: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.pushNamed(context, Routes.selectingIngredient),
             icon: BadgeCount(
               count: 1,
               child: const Icon(Icons.shopping_bag_outlined),
@@ -59,6 +60,12 @@ class _CookingPageState extends State<CookingPage> with SingleTickerProviderStat
         children: [x1, x1, x1, x1, x1, x1],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 }
 
