@@ -118,7 +118,11 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Row(children: [Icon(Icons.group), Text("4 persons")]),
-                          Row(children: [Icon(FridgeMobile.timer), Text("20 min")]),
+                          Row(children: [Icon(Icons.access_time_rounded), Text("20 min")]),
+                          Row(children: [
+                            Icon(Icons.local_fire_department_outlined),
+                            Text("150 kcal")
+                          ]),
                         ],
                       )
                     ],
