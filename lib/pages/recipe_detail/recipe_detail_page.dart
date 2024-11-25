@@ -17,53 +17,71 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       ),
       body: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image(
-              image: AssetImage("assets/images/tomato.png"),
-              // width: height / 5,
+            const Padding(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Image(
+                    image: AssetImage("assets/images/tomato.png"),
+                    // width: height / 5,
+                  ),
+                  Text(
+                    "This is my kind of breakfast egg sandwich and it takes under 5 minutes to make",
+                    textAlign: TextAlign.center,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Row(children: [Icon(Icons.group), Text("4 persons")]),
+                      Row(children: [Icon(Icons.access_time_rounded), Text("20 min")]),
+                      Row(children: [Icon(Icons.local_fire_department_outlined), Text("150 kcal")]),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            Text(
-              "This is my kind of breakfast egg sandwich and it takes under 5 minutes to make",
-              textAlign: TextAlign.center,
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Ingredients"),
+                  Text("7 items"),
+                ],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Row(children: [Icon(Icons.group), Text("4 persons")]),
-                Row(children: [Icon(Icons.access_time_rounded), Text("20 min")]),
-                Row(children: [Icon(Icons.local_fire_department_outlined), Text("150 kcal")]),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Ingredients"),
-                Text("7 items"),
-              ],
-            ),
-            Flexible(
+            SizedBox(
+              height: MediaQuery.sizeOf(context).height / 6,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
                 itemCount: 6,
                 itemBuilder: (context, index) {
+                  EdgeInsetsGeometry? margin;
+                  if (index == 0) {
+                    margin = const EdgeInsets.fromLTRB(10, 4, 4, 4);
+                  } else if (index == 5) {
+                    margin = const EdgeInsets.fromLTRB(4, 4, 10, 4);
+                  }
                   return Card(
                     elevation: 3,
+                    margin: margin,
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image(
-                          image: AssetImage("assets/images/tomato.png"),
-                          width: MediaQuery.sizeOf(context).width / 5,
+                          image: const AssetImage("assets/images/tomato.png"),
+                          height: MediaQuery.sizeOf(context).height / 10,
                         ),
-                        Text("Tomato")
+                        const Text("Tomato")
                       ],
                     ),
                   );
