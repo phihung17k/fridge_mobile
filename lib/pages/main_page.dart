@@ -26,7 +26,7 @@ class _MainPageState extends BaseState<MainPage, HomeBloc> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 1);
+    _pageController = PageController(initialPage: 3);
   }
 
   @override

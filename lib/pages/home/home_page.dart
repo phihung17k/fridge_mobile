@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../../animations/shimmer_loading.dart';
-import '../../utils/fridge_mobile_icons.dart';
-import '../../utils/string_extension.dart';
+import '../../utils/string_constant.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
