@@ -8,6 +8,8 @@ class RecipeFormPage extends StatefulWidget {
 }
 
 class _RecipeFormPageState extends State<RecipeFormPage> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -17,10 +19,29 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
           leading: BackButton(
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text("Selected Ingredient"),
+          title: const Text("Recipe Form"),
           forceMaterialTransparency: true,
-          scrolledUnderElevation: 2,
-          surfaceTintColor: Colors.amber,
+          // scrolledUnderElevation: 2,
+          // surfaceTintColor: Colors.amber,
+          actions: [
+            // IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert_outlined)),
+            TextButton(
+              onPressed: () {
+                if (!_formKey.currentState!.validate()) {
+                  ScaffoldMessengerState state = ScaffoldMessenger.of(context);
+                  state.removeCurrentSnackBar();
+                  state.showSnackBar(
+                    const SnackBar(
+                      content: Text('Processing Data'),
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
+              child: Text("Save"),
+            ),
+          ],
           bottom: TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
             onTap: (value) {},
@@ -34,13 +55,32 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
         body: TabBarView(
           children: [
             Container(
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: InputDecoration(labelText: "Name"),
-                    validator: (value) {},
-                  )
-                ],
+              padding: const EdgeInsets.all(10),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Name",
+                      ),
+                      maxLines: null, // multi line
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Name is not empty";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      decoration: InputDecoration(
+                        labelText: "Description",
+                      ),
+                      maxLines: null,
+                    ),
+                  ],
+                ),
               ),
             ),
             Text("2"),
