@@ -59,10 +59,12 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
               child: Form(
                 key: _formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextFormField(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: "Name",
+                        labelStyle: Theme.of(context).textTheme.labelLarge,
                       ),
                       maxLines: null, // multi line
                       validator: (value) {
@@ -76,8 +78,87 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
                     TextField(
                       decoration: InputDecoration(
                         labelText: "Description",
+                        labelStyle: Theme.of(context).textTheme.labelLarge,
                       ),
                       maxLines: null,
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: TextEditingController(text: "00:00"),
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        labelText: "Cook Time",
+                        labelStyle: Theme.of(context).textTheme.labelLarge,
+                        prefixIcon: const Icon(Icons.access_time_rounded),
+                        border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        )),
+                      ),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              child: Column(
+                                children: [
+                                  Flexible(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 60,
+                                          child: ListWheelScrollView.useDelegate(
+                                            itemExtent: 50,
+                                            diameterRatio: 0.6,
+                                            overAndUnderCenterOpacity: 0.5,
+                                            perspective: 0.005,
+                                            physics: const FixedExtentScrollPhysics(),
+                                            // scrollBehavior: ScrollBehavior(),
+                                            // useMagnifier: true,
+                                            // magnification: 1.5,
+                                            childDelegate: ListWheelChildBuilderDelegate(
+                                              childCount: 100,
+                                              builder: (context, index) {
+                                                return Text(
+                                                  index < 10 ? "0$index" : "$index",
+                                                  style: Theme.of(context).textTheme.headlineMedium,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 60,
+                                          child: ListWheelScrollView.useDelegate(
+                                            itemExtent: 50,
+                                            diameterRatio: 0.6,
+                                            overAndUnderCenterOpacity: 0.5,
+                                            perspective: 0.005,
+                                            physics: const FixedExtentScrollPhysics(),
+                                            // scrollBehavior: ScrollBehavior(),
+                                            // useMagnifier: true,
+                                            // magnification: 1.5,
+                                            childDelegate: ListWheelChildBuilderDelegate(
+                                              childCount: 60,
+                                              builder: (context, index) {
+                                                return Text(
+                                                  index < 10 ? "0$index" : "$index",
+                                                  style: Theme.of(context).textTheme.headlineMedium,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),
