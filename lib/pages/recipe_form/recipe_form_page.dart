@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_mobile/pages/recipe_form/cook_time_dialog.dart';
 
 class RecipeFormPage extends StatefulWidget {
   const RecipeFormPage({super.key});
@@ -9,6 +10,7 @@ class RecipeFormPage extends StatefulWidget {
 
 class _RecipeFormPageState extends State<RecipeFormPage> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController timeController = TextEditingController(text: "00:00");
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
                   );
                 }
               },
-              child: Text("Save"),
+              child: const Text("Save"),
             ),
           ],
           bottom: TabBar(
@@ -84,7 +86,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
                     ),
                     const SizedBox(height: 10),
                     TextField(
-                      controller: TextEditingController(text: "00:00"),
+                      controller: timeController,
                       readOnly: true,
                       decoration: InputDecoration(
                         labelText: "Cook Time",
@@ -99,99 +101,13 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
                         showDialog(
                           context: context,
                           builder: (context) {
-                            return Dialog(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Expanded(child: SizedBox()),
-                                  Expanded(
-                                    child: Stack(
-                                      children: [
-                                        // time
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SizedBox(
-                                              width: 60,
-                                              child: ListWheelScrollView.useDelegate(
-                                                itemExtent: 50,
-                                                diameterRatio: 1.4,
-                                                overAndUnderCenterOpacity: 0.5,
-                                                perspective: 0.004,
-                                                physics: const FixedExtentScrollPhysics(),
-                                                childDelegate: ListWheelChildLoopingListDelegate(
-                                                  children: [
-                                                    for (int i = 0; i < 100; i++)
-                                                      Container(
-                                                        alignment: Alignment.center,
-                                                        child: Text(
-                                                          i < 10 ? "0$i" : "$i",
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .headlineMedium,
-                                                        ),
-                                                      )
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Text(
-                                              ":",
-                                              style: Theme.of(context).textTheme.headlineLarge,
-                                            ),
-                                            SizedBox(
-                                              width: 60,
-                                              child: ListWheelScrollView.useDelegate(
-                                                itemExtent: 50,
-                                                diameterRatio: 1.4,
-                                                overAndUnderCenterOpacity: 0.5,
-                                                perspective: 0.004,
-                                                physics: const FixedExtentScrollPhysics(),
-                                                childDelegate: ListWheelChildLoopingListDelegate(
-                                                  children: [
-                                                    for (int i = 0; i < 100; i++)
-                                                      Container(
-                                                        alignment: Alignment.center,
-                                                        child: Text(
-                                                          i < 10 ? "0$i" : "$i",
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .headlineMedium,
-                                                        ),
-                                                      )
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        // fade
-                                        Positioned.fill(
-                                          child: IgnorePointer(
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Theme.of(context).dialogBackgroundColor,
-                                                    const Color.fromARGB(0, 255, 255, 255),
-                                                    Theme.of(context).dialogBackgroundColor,
-                                                  ],
-                                                  stops: const [0.05, 0.5, 0.95],
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(child: SizedBox()),
-                                ],
-                              ),
-                            );
+                            return const CookTimeDialog();
+                          },
+                        ).then(
+                          (value) {
+                            if (value != null) {
+                              timeController.text = value;
+                            }
                           },
                         );
                       },
