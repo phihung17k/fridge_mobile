@@ -101,58 +101,94 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
                           builder: (context) {
                             return Dialog(
                               child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Flexible(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                  Expanded(child: SizedBox()),
+                                  Expanded(
+                                    child: Stack(
                                       children: [
-                                        SizedBox(
-                                          width: 60,
-                                          child: ListWheelScrollView.useDelegate(
-                                            itemExtent: 50,
-                                            diameterRatio: 0.6,
-                                            overAndUnderCenterOpacity: 0.5,
-                                            perspective: 0.005,
-                                            physics: const FixedExtentScrollPhysics(),
-                                            // scrollBehavior: ScrollBehavior(),
-                                            // useMagnifier: true,
-                                            // magnification: 1.5,
-                                            childDelegate: ListWheelChildBuilderDelegate(
-                                              childCount: 100,
-                                              builder: (context, index) {
-                                                return Text(
-                                                  index < 10 ? "0$index" : "$index",
-                                                  style: Theme.of(context).textTheme.headlineMedium,
-                                                );
-                                              },
+                                        // time
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            SizedBox(
+                                              width: 60,
+                                              child: ListWheelScrollView.useDelegate(
+                                                itemExtent: 50,
+                                                diameterRatio: 1.4,
+                                                overAndUnderCenterOpacity: 0.5,
+                                                perspective: 0.004,
+                                                physics: const FixedExtentScrollPhysics(),
+                                                childDelegate: ListWheelChildLoopingListDelegate(
+                                                  children: [
+                                                    for (int i = 0; i < 100; i++)
+                                                      Container(
+                                                        alignment: Alignment.center,
+                                                        child: Text(
+                                                          i < 10 ? "0$i" : "$i",
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .headlineMedium,
+                                                        ),
+                                                      )
+                                                  ],
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                            Text(
+                                              ":",
+                                              style: Theme.of(context).textTheme.headlineLarge,
+                                            ),
+                                            SizedBox(
+                                              width: 60,
+                                              child: ListWheelScrollView.useDelegate(
+                                                itemExtent: 50,
+                                                diameterRatio: 1.4,
+                                                overAndUnderCenterOpacity: 0.5,
+                                                perspective: 0.004,
+                                                physics: const FixedExtentScrollPhysics(),
+                                                childDelegate: ListWheelChildLoopingListDelegate(
+                                                  children: [
+                                                    for (int i = 0; i < 100; i++)
+                                                      Container(
+                                                        alignment: Alignment.center,
+                                                        child: Text(
+                                                          i < 10 ? "0$i" : "$i",
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .headlineMedium,
+                                                        ),
+                                                      )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        SizedBox(
-                                          width: 60,
-                                          child: ListWheelScrollView.useDelegate(
-                                            itemExtent: 50,
-                                            diameterRatio: 0.6,
-                                            overAndUnderCenterOpacity: 0.5,
-                                            perspective: 0.005,
-                                            physics: const FixedExtentScrollPhysics(),
-                                            // scrollBehavior: ScrollBehavior(),
-                                            // useMagnifier: true,
-                                            // magnification: 1.5,
-                                            childDelegate: ListWheelChildBuilderDelegate(
-                                              childCount: 60,
-                                              builder: (context, index) {
-                                                return Text(
-                                                  index < 10 ? "0$index" : "$index",
-                                                  style: Theme.of(context).textTheme.headlineMedium,
-                                                );
-                                              },
+                                        // fade
+                                        Positioned.fill(
+                                          child: IgnorePointer(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Theme.of(context).dialogBackgroundColor,
+                                                    const Color.fromARGB(0, 255, 255, 255),
+                                                    Theme.of(context).dialogBackgroundColor,
+                                                  ],
+                                                  stops: const [0.05, 0.5, 0.95],
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         )
                                       ],
                                     ),
-                                  )
+                                  ),
+                                  Expanded(child: SizedBox()),
                                 ],
                               ),
                             );
