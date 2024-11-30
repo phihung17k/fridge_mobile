@@ -10,7 +10,23 @@ class RecipeFormPage extends StatefulWidget {
 
 class _RecipeFormPageState extends State<RecipeFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController timeController = TextEditingController(text: "00:00");
+  late final TextEditingController _timeController;
+
+  int hour = 0;
+  int minute = 0;
+
+  String combineTime(int hour, int minute) {
+    String result = "";
+    result = hour < 10 ? "0$hour" : "$hour";
+    result = minute < 10 ? "$result : 0$minute" : "$result : $minute";
+    return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _timeController = TextEditingController(text: combineTime(hour, minute));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +102,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
                     ),
                     const SizedBox(height: 10),
                     TextField(
-                      controller: timeController,
+                      controller: _timeController,
                       readOnly: true,
                       decoration: InputDecoration(
                         labelText: "Cook Time",
@@ -98,15 +114,20 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
                         )),
                       ),
                       onTap: () {
-                        showDialog(
+                        showDialog<(int, int)>(
                           context: context,
                           builder: (context) {
-                            return const CookTimeDialog();
+                            return CookTimeDialog(
+                              initialHour: hour,
+                              initialMinute: minute,
+                            );
                           },
                         ).then(
-                          (value) {
+                          ((int, int)? value) {
                             if (value != null) {
-                              timeController.text = value;
+                              hour = value.$1;
+                              minute = value.$2;
+                              _timeController.text = combineTime(value.$1, value.$2);
                             }
                           },
                         );
@@ -122,5 +143,11 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _timeController.dispose();
+    super.dispose();
   }
 }

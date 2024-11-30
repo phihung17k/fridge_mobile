@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:fridge_mobile/pages/recipe_form/list_wheel_scroll_item.dart';
 
 class CookTimeDialog extends StatefulWidget {
+  final int initialHour;
+  final int initialMinute;
   final double? labelItemExtent;
   final int itemCount;
   final double listWheelScrollWidth;
+  final double listWheelScrollOpacity;
+  final double listWheelScrollPerspective;
   final double listWheelScrollItemExtent;
   final double listWheelScrollItemDiameterRatio;
   final double? colonWidth;
 
   const CookTimeDialog({
     super.key,
+    this.initialHour = 0,
+    this.initialMinute = 0,
     this.labelItemExtent = 70,
     this.itemCount = 60,
     this.listWheelScrollWidth = 50,
+    this.listWheelScrollOpacity = 0.5,
+    this.listWheelScrollPerspective = 0.004,
     this.listWheelScrollItemExtent = 40,
     this.listWheelScrollItemDiameterRatio = 1.5,
     this.colonWidth = 20,
@@ -27,11 +34,18 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
   int hour = 0;
   int minute = 0;
 
-  String combineTime(int hour, int minute) {
-    String result = "";
-    result = hour < 10 ? "0$hour" : "$hour";
-    result = minute < 10 ? "$result : 0$minute" : "$result : $minute";
-    return result;
+  late FixedExtentScrollController _hourScrollController;
+  late FixedExtentScrollController _minuteScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    hour = widget.initialHour;
+    minute = widget.initialMinute;
+
+    _hourScrollController = FixedExtentScrollController(initialItem: widget.initialHour);
+    _minuteScrollController = FixedExtentScrollController(initialItem: widget.initialMinute);
   }
 
   @override
@@ -45,7 +59,7 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
           child: const Text("Cancel"),
         ),
         TextButton(
-          onPressed: () => Navigator.pop(context, combineTime(hour, minute)),
+          onPressed: () => Navigator.pop(context, (hour, minute)),
           child: const Text("Ok"),
         )
       ],
@@ -84,12 +98,29 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ListWheelScrollItem(
-                        itemCount: 100,
-                        listWheelScrollWidth: widget.listWheelScrollWidth,
-                        listWheelScrollItemExtent: widget.listWheelScrollItemExtent,
-                        listWheelScrollItemDiameterRatio: widget.listWheelScrollItemDiameterRatio,
-                        onSelectedItem: (value) => hour = value,
+                      SizedBox(
+                        width: widget.listWheelScrollWidth,
+                        child: ListWheelScrollView.useDelegate(
+                          controller: _hourScrollController,
+                          itemExtent: widget.listWheelScrollItemExtent,
+                          diameterRatio: widget.listWheelScrollItemDiameterRatio,
+                          overAndUnderCenterOpacity: widget.listWheelScrollOpacity,
+                          perspective: widget.listWheelScrollPerspective,
+                          physics: const FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (value) => hour = value,
+                          childDelegate: ListWheelChildLoopingListDelegate(
+                            children: [
+                              for (int i = 0; i < 100; i++)
+                                Container(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    i < 10 ? "0$i" : "$i",
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                )
+                            ],
+                          ),
+                        ),
                       ),
                       SizedBox(
                         width: widget.colonWidth,
@@ -99,12 +130,29 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
                           style: Theme.of(context).textTheme.headlineLarge,
                         ),
                       ),
-                      ListWheelScrollItem(
-                        itemCount: 60,
-                        listWheelScrollWidth: widget.listWheelScrollWidth,
-                        listWheelScrollItemExtent: widget.listWheelScrollItemExtent,
-                        listWheelScrollItemDiameterRatio: widget.listWheelScrollItemDiameterRatio,
-                        onSelectedItem: (value) => minute = value,
+                      SizedBox(
+                        width: widget.listWheelScrollWidth,
+                        child: ListWheelScrollView.useDelegate(
+                          controller: _minuteScrollController,
+                          itemExtent: widget.listWheelScrollItemExtent,
+                          diameterRatio: widget.listWheelScrollItemDiameterRatio,
+                          overAndUnderCenterOpacity: widget.listWheelScrollOpacity,
+                          perspective: widget.listWheelScrollPerspective,
+                          physics: const FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (value) => minute = value,
+                          childDelegate: ListWheelChildLoopingListDelegate(
+                            children: [
+                              for (int i = 0; i < 60; i++)
+                                Container(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    i < 10 ? "0$i" : "$i",
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                )
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -134,5 +182,12 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _hourScrollController.dispose();
+    _minuteScrollController.dispose();
+    super.dispose();
   }
 }
