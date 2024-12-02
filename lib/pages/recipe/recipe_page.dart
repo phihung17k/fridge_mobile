@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_mobile/routes.dart';
 
 class RecipePage extends StatefulWidget {
   const RecipePage({super.key});
@@ -15,7 +16,12 @@ class _RecipePageState extends State<RecipePage> {
         forceMaterialTransparency: true,
         shape: const Border(bottom: BorderSide(color: Colors.grey)),
         title: const Text("Recipe"),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.add))],
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, Routes.recipeForm),
+            icon: const Icon(Icons.add),
+          )
+        ],
       ),
       body: ListView.builder(
         itemCount: 20,

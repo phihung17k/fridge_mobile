@@ -31,18 +31,12 @@ class CookTimeDialog extends StatefulWidget {
 }
 
 class _CookTimeDialogState extends State<CookTimeDialog> {
-  int hour = 0;
-  int minute = 0;
-
   late FixedExtentScrollController _hourScrollController;
   late FixedExtentScrollController _minuteScrollController;
 
   @override
   void initState() {
     super.initState();
-
-    hour = widget.initialHour;
-    minute = widget.initialMinute;
 
     _hourScrollController = FixedExtentScrollController(initialItem: widget.initialHour);
     _minuteScrollController = FixedExtentScrollController(initialItem: widget.initialMinute);
@@ -59,7 +53,10 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
           child: const Text("Cancel"),
         ),
         TextButton(
-          onPressed: () => Navigator.pop(context, (hour, minute)),
+          onPressed: () {
+            Navigator.pop(context,
+                (_hourScrollController.selectedItem, _minuteScrollController.selectedItem));
+          },
           child: const Text("Ok"),
         )
       ],
@@ -107,7 +104,6 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
                           overAndUnderCenterOpacity: widget.listWheelScrollOpacity,
                           perspective: widget.listWheelScrollPerspective,
                           physics: const FixedExtentScrollPhysics(),
-                          onSelectedItemChanged: (value) => hour = value,
                           childDelegate: ListWheelChildLoopingListDelegate(
                             children: [
                               for (int i = 0; i < 100; i++)
@@ -139,7 +135,6 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
                           overAndUnderCenterOpacity: widget.listWheelScrollOpacity,
                           perspective: widget.listWheelScrollPerspective,
                           physics: const FixedExtentScrollPhysics(),
-                          onSelectedItemChanged: (value) => minute = value,
                           childDelegate: ListWheelChildLoopingListDelegate(
                             children: [
                               for (int i = 0; i < 60; i++)

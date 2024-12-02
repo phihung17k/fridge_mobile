@@ -1,5 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fridge_mobile/pages/recipe_form/cook_time_dialog.dart';
+import 'package:fridge_mobile/pages/recipe_form/overview_form.dart';
 
 class RecipeFormPage extends StatefulWidget {
   const RecipeFormPage({super.key});
@@ -9,8 +10,8 @@ class RecipeFormPage extends StatefulWidget {
 }
 
 class _RecipeFormPageState extends State<RecipeFormPage> {
-  final _formKey = GlobalKey<FormState>();
   late final TextEditingController _timeController;
+  late final TextEditingController _servingController;
 
   int hour = 0;
   int minute = 0;
@@ -26,120 +27,102 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
   void initState() {
     super.initState();
     _timeController = TextEditingController(text: combineTime(hour, minute));
+    _servingController = TextEditingController(text: "1");
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: () => Navigator.pop(context),
+      initialIndex: 1,
+      child: Form(
+        child: Scaffold(
+          appBar: AppBar(
+            leading: BackButton(
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: const Text("Recipe Form"),
+            forceMaterialTransparency: true,
+            // scrolledUnderElevation: 2,
+            // surfaceTintColor: Colors.amber,
+            actions: [
+              // IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert_outlined)),
+              Builder(builder: (context) {
+                return TextButton(
+                  onPressed: () {
+                    if (!Form.of(context).validate()) {
+                      ScaffoldMessengerState state = ScaffoldMessenger.of(context);
+                      state.removeCurrentSnackBar();
+                      state.showSnackBar(
+                        const SnackBar(
+                          content: Text('Processing Data'),
+                          duration: Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text("Save"),
+                );
+              }),
+            ],
+            bottom: const TabBar(
+              indicatorSize: TabBarIndicatorSize.tab,
+              tabs: <Widget>[
+                Tab(text: "Overview"),
+                Tab(text: "Ingredients"),
+                Tab(text: "Steps"),
+              ],
+            ),
           ),
-          title: const Text("Recipe Form"),
-          forceMaterialTransparency: true,
-          // scrolledUnderElevation: 2,
-          // surfaceTintColor: Colors.amber,
-          actions: [
-            // IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert_outlined)),
-            TextButton(
-              onPressed: () {
-                if (!_formKey.currentState!.validate()) {
-                  ScaffoldMessengerState state = ScaffoldMessenger.of(context);
-                  state.removeCurrentSnackBar();
-                  state.showSnackBar(
-                    const SnackBar(
-                      content: Text('Processing Data'),
-                      duration: Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
+          body: TabBarView(
+            children: [
+              const OverviewForm(),
+              ReorderableListView.builder(
+                // buildDefaultDragHandles: false,
+                padding: const EdgeInsets.all(8),
+                itemCount: 5,
+                itemBuilder: (context, index) {
+                  return Card(
+                    key: Key("reorder item $index"),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    color: Colors.white,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      leading: const Image(
+                        image: AssetImage("assets/images/broccoli.png"),
+                      ),
+                      title: Text("Title $index"),
+                      trailing: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.close,
+                          color: Colors.red,
+                        ),
+                      ),
                     ),
                   );
-                }
-              },
-              child: const Text("Save"),
-            ),
-          ],
-          bottom: TabBar(
-            indicatorSize: TabBarIndicatorSize.tab,
-            onTap: (value) {},
-            tabs: const <Widget>[
-              Tab(text: "Overview"),
-              Tab(text: "Ingredients"),
-              Tab(text: "Steps"),
+                },
+                onReorder: (oldIndex, newIndex) {},
+                proxyDecorator: (child, index, animation) {
+                  return AnimatedBuilder(
+                    animation: animation,
+                    builder: (BuildContext context, Widget? child) {
+                      // animation's effect for reorder item
+                      return Material(
+                        color: Colors.transparent,
+                        child: child,
+                      );
+                    },
+                    child: child,
+                  );
+                },
+              ),
+              Text("3"),
             ],
           ),
-        ),
-        body: TabBarView(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Name",
-                        labelStyle: Theme.of(context).textTheme.labelLarge,
-                      ),
-                      maxLines: null, // multi line
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Name is not empty";
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        labelStyle: Theme.of(context).textTheme.labelLarge,
-                      ),
-                      maxLines: null,
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _timeController,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        labelText: "Cook Time",
-                        labelStyle: Theme.of(context).textTheme.labelLarge,
-                        prefixIcon: const Icon(Icons.access_time_rounded),
-                        border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                          Radius.circular(8.0),
-                        )),
-                      ),
-                      onTap: () {
-                        showDialog<(int, int)>(
-                          context: context,
-                          builder: (context) {
-                            return CookTimeDialog(
-                              initialHour: hour,
-                              initialMinute: minute,
-                            );
-                          },
-                        ).then(
-                          ((int, int)? value) {
-                            if (value != null) {
-                              hour = value.$1;
-                              minute = value.$2;
-                              _timeController.text = combineTime(value.$1, value.$2);
-                            }
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Text("2"),
-            Text("3"),
-          ],
         ),
       ),
     );
@@ -148,6 +131,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
   @override
   void dispose() {
     _timeController.dispose();
+    _servingController.dispose();
     super.dispose();
   }
 }
