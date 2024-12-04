@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_mobile/pages/recipe_form/ingredients_form.dart';
 import 'package:fridge_mobile/pages/recipe_form/overview_form.dart';
+import 'package:fridge_mobile/pages/recipe_form/steps_form.dart';
 
 class RecipeFormPage extends StatefulWidget {
   const RecipeFormPage({super.key});
@@ -33,7 +35,7 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      initialIndex: 1,
+      initialIndex: 2,
       child: Form(
         child: Scaffold(
           appBar: AppBar(
@@ -77,64 +79,8 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
           body: TabBarView(
             children: [
               const OverviewForm(),
-              Scaffold(
-                body: ReorderableListView.builder(
-                  // buildDefaultDragHandles: false,
-                  padding: const EdgeInsets.all(8),
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      key: Key("reorder item $index"),
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      color: Colors.white,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                        leading: const Image(
-                          image: AssetImage("assets/images/broccoli.png"),
-                        ),
-                        title: Text("Title $index"),
-                        trailing: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.close,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  onReorder: (oldIndex, newIndex) {},
-                  proxyDecorator: (child, index, animation) {
-                    return AnimatedBuilder(
-                      animation: animation,
-                      builder: (BuildContext context, Widget? child) {
-                        // animation's effect for reorder itemw
-                        return Material(
-                          color: Colors.transparent,
-                          child: child,
-                        );
-                      },
-                      child: child,
-                    );
-                  },
-                ),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                          color: Colors.amber,
-                        );
-                      },
-                    );
-                  },
-                  child: const Icon(Icons.add),
-                ),
-              ),
-              Text("3"),
+              IngredientsForm(),
+              StepsForm(),
             ],
           ),
         ),
