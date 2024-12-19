@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class StepsForm extends StatefulWidget {
@@ -25,20 +27,33 @@ class CustomScrollableScrollPhysics extends ScrollPhysics {
 
 class _StepsFormState extends State<StepsForm> {
   late ScrollController _controller;
-  double itemExtent = 50;
+  double itemExtent = 0;
   double scrollHeight = 0;
   double scrollPadding = 20;
   double scrollbarPostition = 0;
   double scrollbarHeight = 0;
+  double itemListHeight = 0;
+  int itemsCount = 0;
+  late Map<String, int> alphabetMap;
 
   @override
   void initState() {
     super.initState();
     _controller = ScrollController();
+    Iterable<int> alphabetList = Iterable.generate(26);
+    alphabetMap = {
+      for (var item in alphabetList) String.fromCharCode(item + 65): Random().nextInt(5)
+    };
+    alphabetMap['B'] = 27;
+    itemsCount = alphabetList.length;
   }
 
   @override
   Widget build(BuildContext context) {
+    if (itemExtent == 0) {
+      itemExtent = MediaQuery.sizeOf(context).height / 20;
+      itemListHeight = itemExtent * itemsCount;
+    }
     return Row(
       children: [
         Expanded(
@@ -46,17 +61,37 @@ class _StepsFormState extends State<StepsForm> {
               // Stack(
               //   children: [
               ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            behavior: ScrollConfiguration.of(context).copyWith(scrollbars: true),
             child: ListView.builder(
-              itemExtent: itemExtent,
+              // itemExtent: itemExtent,
               controller: _controller,
-              itemCount: 100,
+              itemCount: itemsCount,
               itemBuilder: (BuildContext context, int index) {
+                MapEntry<String, int> entry = alphabetMap.entries.elementAt(index);
                 return Container(
-                  color: index % 2 == 0 ? Colors.grey.shade300 : null,
+                  // color: index % 2 == 0 ? Colors.grey.shade300 : null,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.centerLeft,
-                  child: Text('Scrollable 1 : Index $index'),
+                  // child: Text('Scrollable 1 : Index $index'),
+                  child: Column(
+                    children: [
+                      Container(
+                        color: Colors.grey.shade300,
+                        height: itemExtent,
+                        padding: const EdgeInsets.all(8.0),
+                        alignment: Alignment.centerLeft,
+                        child: Text(entry.key),
+                      ),
+                      for (int i = 0; i <= entry.value; i++)
+                        Container(
+                          color: Colors.blue.shade300,
+                          height: itemExtent,
+                          padding: const EdgeInsets.all(8.0),
+                          alignment: Alignment.centerLeft,
+                          child: Text("Scrollable ${entry.key} : Index $i"),
+                        )
+                    ],
+                  ),
                 );
               },
             ),
@@ -91,9 +126,7 @@ class _StepsFormState extends State<StepsForm> {
                 setState(() {
                   scrollHeight = renderbox.size.height - scrollPadding * 2;
                   scrollbarHeight = scrollHeight / 26;
-                  debugPrint("WidgetsBinding.instance.addPostFrameCallback");
-                  // debugPrint("scrollHeight $scrollHeight");
-                  // debugPrint("scrollbarHeight $scrollbarHeight");
+                  // debugPrint("WidgetsBinding.instance.addPostFrameCallback");
                 });
               }
             },
