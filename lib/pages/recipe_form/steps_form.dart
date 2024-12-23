@@ -44,6 +44,9 @@ class _StepsFormState extends State<StepsForm> {
   double standardizedScrollbarHeight = 0;
 
   double clampMaxScrollExtent(double value) {
+    // if (value < 0) {
+    //   value = 0;
+    // }
     return value.clamp(0, scrollHeight - scrollbarHeight);
   }
 
@@ -185,22 +188,30 @@ class _StepsFormState extends State<StepsForm> {
             color: Colors.yellow.shade100,
             child: GestureDetector(
               onVerticalDragUpdate: (details) {
-                // scroll in range [0..scroll height]
-                if (0 <= scrollbarPostition && scrollbarPostition <= scrollHeight) {
-                  setState(() {
-                    scrollbarPostition += details.delta.dy;
-                    debugPrint("onVerticalDragUpdate $scrollbarPostition ${details.localPosition}");
-                  });
+                // ensure scrollbarPostition in range [0..scroll height]
+                if (0 <= details.localPosition.dy && details.localPosition.dy <= scrollHeight) {
+                  // debugPrint("onVerticalDragUpdate $scrollbarPostition ${details.localPosition}");
+                  int index = (details.localPosition.dy / scrollbarHeight)
+                      .floor()
+                      .clamp(0, contentOffsets.length - 1);
+
+                  if (scrollbarPostition + details.delta.dy > 0) {
+                    setState(() {
+                      scrollbarPostition += details.delta.dy;
+                      // scrollbarPostition = alphabetOffsets.values.elementAt(index);
+                    });
+                    controller.jumpTo(contentOffsets.values.elementAt(index));
+                  }
                 }
               },
               onPanDown: (details) {
                 // set scrollbar position in range [0..scroll height - scrollbarHeight] to avoid overrflow
+                int index = (details.localPosition.dy / scrollbarHeight).floor();
                 setState(() {
-                  int index = (details.localPosition.dy / scrollbarHeight).floor();
                   scrollbarPostition = alphabetOffsets.values.elementAt(index);
-                  controller.jumpTo(contentOffsets.values.elementAt(index));
-                  debugPrint("onPanDown ${details.localPosition.dy}");
                 });
+                controller.jumpTo(contentOffsets.values.elementAt(index));
+                // debugPrint("onPanDown ${details.localPosition.dy}");
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -212,7 +223,6 @@ class _StepsFormState extends State<StepsForm> {
                     AnimatedPositioned(
                       // set scrollbar position to center when drag
                       top: clampMaxScrollExtent(scrollbarPostition),
-                      // top: clampMaxScrollExtent(scrollbarPostition - scrollbarHeight / 2),
                       duration: Duration.zero,
                       child: Container(
                         width: 15,
