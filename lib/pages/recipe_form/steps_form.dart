@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class StepsForm extends StatefulWidget {
@@ -10,33 +9,15 @@ class StepsForm extends StatefulWidget {
   State<StepsForm> createState() => _StepsFormState();
 }
 
-class CustomScrollableScrollPhysics extends ScrollPhysics {
-  /// Creates scroll physics that does not let the user scroll.
-  const CustomScrollableScrollPhysics({super.parent});
-
-  @override
-  CustomScrollableScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CustomScrollableScrollPhysics(parent: buildParent(ancestor));
-  }
-
-  @override
-  bool get allowUserScrolling => true;
-
-  @override
-  bool get allowImplicitScrolling => false;
-}
-
 class _StepsFormState extends State<StepsForm> {
   late ScrollController controller;
-  double scrollColumnHeight = 0;
+  // double viewportHeight = 0;
   double itemExtent = 0;
   double scrollHeight = 0;
   double scrollPadding = 60;
   double scrollbarPostition = 0;
   // from DragUpdateDetails
   double locationScrollPosition = 0;
-
-  double contentPostition = 0;
   double scrollbarHeight = 0;
   double itemListHeight = 0;
   late Map<String, int> alphabetMap;
@@ -50,12 +31,10 @@ class _StepsFormState extends State<StepsForm> {
   bool isVerticalDrag = false;
   late String currentLetter;
   double alphabetScrollWidget = 15;
-  OverlayEntry? overlayEntry;
+
+  int unableScrollLetterIndex = 0;
 
   double clampMaxScrollExtent(double value) {
-    // if (value < 0) {
-    //   value = 0;
-    // }
     return value.clamp(0, scrollHeight - scrollbarHeight);
   }
 
@@ -65,68 +44,51 @@ class _StepsFormState extends State<StepsForm> {
     controller = ScrollController();
     alphabet = Iterable.generate(26, (index) => String.fromCharCode(index + 65));
     alphabetMap = {for (String letter in alphabet) letter: (1 + Random().nextInt(5))};
-    alphabetMap['A'] = 2;
-    alphabetMap['B'] = 5;
-    alphabetMap['Z'] = 17;
     currentLetter = alphabetMap.keys.first;
 
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {},
-    );
     controller.addListener(
       () {
-        var offsets = contentOffsets.values;
-        for (var i = 0; i < offsets.length; i++) {
-          // debugPrint("controller position");
-
-          // set scroll position = get (content offset - 1) when content offset > current content position
-          // ex: { A: 0, B: 100, C: 200 } and current content position = 150
-          // => identity C offset > current content position
-          // => current content position is between B and C => set scroll position is B
-          if (i > 0 && offsets.elementAt(i) > controller.position.pixels) {
-            setState(() {
-              // debugPrint("controller position ${controller.position.pixels}");
-              scrollbarPostition = alphabetOffsets.values.elementAt(i - 1);
-            });
-            break;
-          } else if (i == offsets.length - 1 && offsets.elementAt(i) < controller.position.pixels) {
-            // case scroll to 'Z', set scroll position when current content position > content offset 'Z'
-            setState(() {
-              // debugPrint("controller position ${controller.position.pixels}");
-              scrollbarPostition = alphabetOffsets.values.elementAt(i);
-            });
-            break;
+        if (!isVerticalDrag) {
+          debugPrint("addListener $isVerticalDrag");
+          var offsets = contentOffsets.values;
+          for (var i = 0; i < offsets.length; i++) {
+            // set scroll position = get (content offset - 1) when content offset > current content position
+            // ex: { A: 0, B: 100, C: 200 } and current content position = 150
+            // => identity C offset > current content position
+            // => current content position is between B and C => set scroll position is B
+            if (i > 0 && offsets.elementAt(i) > controller.position.pixels) {
+              setState(() {
+                scrollbarPostition = alphabetOffsets.values.elementAt(i - 1);
+              });
+              break;
+            } else if (i == offsets.length - 1 &&
+                offsets.elementAt(i) < controller.position.pixels) {
+              // case scroll to 'Z', set scroll position when current content position > content offset 'Z'
+              setState(() {
+                scrollbarPostition = alphabetOffsets.values.elementAt(i);
+              });
+              break;
+            }
           }
         }
       },
     );
   }
 
-  void removeOverlay() {
-    overlayEntry?.remove();
-    overlayEntry?.dispose();
-    overlayEntry = null;
-  }
-
   void showOverlay() {
     if (!isOverlayVisible) {
-      setState(() {
-        isOverlayVisible = true;
-      });
+      isOverlayVisible = true;
     }
   }
 
   void hideOverlay() {
     if (isOverlayVisible) {
-      setState(() {
-        isOverlayVisible = false;
-      });
+      isOverlayVisible = false;
     }
   }
 
   Widget displayLetterOverlay() {
     if (isOverlayVisible) {
-      // debugPrint("displayLetterOverlay $scrollbarHeight");
       return AnimatedPositioned(
         top: clampMaxScrollExtent(scrollbarPostition) + scrollPadding - 60 / 4,
         right: alphabetScrollWidget + 40,
@@ -153,7 +115,6 @@ class _StepsFormState extends State<StepsForm> {
   @override
   Widget build(BuildContext context) {
     if (itemExtent == 0) {
-      // debugPrint("build itemExtent == 0");
       itemExtent = MediaQuery.sizeOf(context).height / 20;
       itemListHeight = itemExtent * alphabet.length;
 
@@ -162,11 +123,11 @@ class _StepsFormState extends State<StepsForm> {
         if (i == 0) {
           contentOffsets[entry.key] = 0;
         } else {
-          // extent of a letter block =
-          //  letter block padding top        [letterBlockPadding]
-          //  + letter label                  [itemExtent]
-          //  + list of letter block          [itemExtent] * length
-          //  + letter block padding bottom   [letterBlockPadding]
+          /// extent of a letter block =
+          ///  letter block padding top        [letterBlockPadding]
+          ///  + letter label                  [itemExtent]
+          ///  + list of letter block          [itemExtent] * length
+          /// + letter block padding bottom    [letterBlockPadding]
           contentOffsets[entry.key] = contentOffsets.values.last +
               letterBlockPadding +
               itemExtent +
@@ -175,168 +136,177 @@ class _StepsFormState extends State<StepsForm> {
         }
       }
     }
-    return Stack(children: [
-      Row(
-        children: [
-          Expanded(
-            child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-              child: ListView.builder(
-                // itemExtent: itemExtent,
-                controller: controller,
-                itemCount: alphabet.length,
-                itemBuilder: (BuildContext context, int index) {
-                  MapEntry<String, int> entry = alphabetMap.entries.elementAt(index);
+    return Stack(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                child: ListView.builder(
+                  // itemExtent: itemExtent,
+                  controller: controller,
+                  itemCount: alphabet.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    MapEntry<String, int> entry = alphabetMap.entries.elementAt(index);
 
-                  return Container(
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.centerLeft,
-                    child: Column(
-                      children: [
-                        Container(
-                          color: Colors.grey.shade300,
-                          height: itemExtent,
-                          padding: const EdgeInsets.all(8.0),
-                          alignment: Alignment.centerLeft,
-                          child: Text(entry.key),
-                        ),
-                        for (int i = 1; i <= entry.value; i++)
+                    return Container(
+                      padding: const EdgeInsets.all(8.0),
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        children: [
                           Container(
-                            color: Colors.blue.shade300,
+                            color: Colors.grey.shade300,
                             height: itemExtent,
                             padding: const EdgeInsets.all(8.0),
                             alignment: Alignment.centerLeft,
-                            child: Text("Scrollable ${entry.key} : Index $i"),
-                          )
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          Builder(builder: (context) {
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) {
-                RenderBox renderbox = context.findRenderObject() as RenderBox;
-
-                /// set:
-                /// - scrollbar's height
-                /// - maximum scroll extent
-                if (scrollHeight == 0) {
-                  setState(() {
-                    scrollColumnHeight = renderbox.size.height;
-                    scrollHeight = renderbox.size.height - scrollPadding * 2;
-                    scrollbarHeight = scrollHeight / alphabetMap.length;
-                    standardizedScrollbarHeight = clampMaxScrollExtent(scrollbarHeight);
-                    alphabetOffsets = {
-                      for (int i = 0; i < alphabet.length; i++)
-                        alphabet.elementAt(i): scrollbarHeight * i
-                    };
-                  });
-                }
-              },
-            );
-            return Container(
-              width: alphabetScrollWidget,
-              // height: double.maxFinite,
-              margin: EdgeInsets.zero,
-              padding: EdgeInsets.symmetric(vertical: scrollPadding),
-              color: Colors.yellow.shade100,
-              child: GestureDetector(
-                onVerticalDragUpdate: (details) {
-                  // ensure scrollbarPostition in range [0..scroll height]
-                  if (0 <= details.localPosition.dy && details.localPosition.dy <= scrollHeight) {
-                    int index = (details.localPosition.dy / scrollbarHeight)
-                        .floor()
-                        .clamp(0, contentOffsets.length - 1);
-                    MapEntry<String, double> offsetMap = contentOffsets.entries.elementAt(index);
-                    if (scrollbarPostition + details.delta.dy > 0) {
-                      setState(() {
-                        // scrollbarPostition += details.delta.dy;
-                        scrollbarPostition = details.localPosition.dy;
-                        // locationScrollPosition =
-                        currentLetter = offsetMap.key;
-                        isVerticalDrag = true;
-                      });
-                      controller.jumpTo(contentOffsets.values.elementAt(index));
-                    }
-                  }
-                  showOverlay();
-                },
-                onVerticalDragEnd: (details) {
-                  setState(() {
-                    isVerticalDrag = false;
-                  });
-                  hideOverlay();
-                },
-                onPanDown: (details) {
-                  // set scrollbar position in range [0..scroll height - scrollbarHeight] to avoid overrflow
-                  int index = (details.localPosition.dy / scrollbarHeight).floor();
-                  MapEntry<String, double> offsetMap = alphabetOffsets.entries.elementAt(index);
-                  setState(() {
-                    scrollbarPostition = offsetMap.value;
-                    currentLetter = offsetMap.key;
-                  });
-                  controller.jumpTo(contentOffsets.values.elementAt(index));
-                  showOverlay();
-                },
-                onPanCancel: () {
-                  hideOverlay();
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.blueGrey.shade50,
-                  ),
-                  child: Stack(
-                    children: [
-                      AnimatedPositioned(
-                        // set scrollbar position to center when drag
-                        top: clampMaxScrollExtent(scrollbarPostition),
-                        duration:
-                            isVerticalDrag ? Duration.zero : const Duration(milliseconds: 150),
-                        child: Container(
-                          width: 15,
-                          height: scrollbarHeight,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.lightGreen,
+                            child: Text(entry.key),
                           ),
-                        ),
-                      ),
-                      Column(
-                        children: [
-                          for (int i = 0; i < alphabet.length; i++)
+                          for (int i = 1; i <= entry.value; i++)
                             Container(
-                              height: standardizedScrollbarHeight,
-                              // color: i == alphabet.length - 1 ? Colors.amber : null,
-                              decoration: i < alphabet.length - 1
-                                  ? const BoxDecoration(border: Border(bottom: BorderSide()))
-                                  : null,
-                              alignment: Alignment.center,
-                              child: Text(
-                                alphabet.elementAt(i),
-                                style: Theme.of(context).textTheme.labelMedium,
-                              ),
+                              color: Colors.blue.shade300,
+                              height: itemExtent,
+                              padding: const EdgeInsets.all(8.0),
+                              alignment: Alignment.centerLeft,
+                              child: Text("Scrollable ${entry.key} : Index $i"),
                             )
                         ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
-            );
-          })
-        ],
-      ),
-      displayLetterOverlay(),
-    ]);
+            ),
+            Builder(builder: (context) {
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) {
+                  // RenderBox renderbox = context.findRenderObject() as RenderBox;
+
+                  /// set:
+                  /// - scrollbar's height
+                  /// - maximum scroll extent
+                  if (scrollHeight == 0) {
+                    setState(() {
+                      // viewportHeight = renderbox.size.height;
+                      scrollHeight = controller.position.viewportDimension - scrollPadding * 2;
+                      scrollbarHeight = scrollHeight / alphabetMap.length;
+                      standardizedScrollbarHeight = clampMaxScrollExtent(scrollbarHeight);
+                      alphabetOffsets = {
+                        for (int i = 0; i < alphabet.length; i++)
+                          alphabet.elementAt(i): scrollbarHeight * i
+                      };
+                    });
+                  }
+                },
+              );
+              return Container(
+                width: alphabetScrollWidget,
+                // height: double.maxFinite,
+                margin: EdgeInsets.zero,
+                padding: EdgeInsets.symmetric(vertical: scrollPadding),
+                color: Colors.yellow.shade100,
+                child: GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    // ensure scrollbarPostition in range [0..scroll height]
+                    if (0 <= details.localPosition.dy && details.localPosition.dy <= scrollHeight) {
+                      int index = (details.localPosition.dy / scrollbarHeight)
+                          .floor()
+                          .clamp(0, contentOffsets.length - 1);
+                      MapEntry<String, double> offsetMap = contentOffsets.entries.elementAt(index);
+                      if (scrollbarPostition + details.delta.dy > 0) {
+                        setState(() {
+                          // scrollbarPostition += details.delta.dy;
+                          scrollbarPostition = details.localPosition.dy;
+                          currentLetter = offsetMap.key;
+                          isVerticalDrag = true;
+                          if (unableScrollLetterIndex == 0 &&
+                              controller.position.extentAfter == 0) {
+                            unableScrollLetterIndex = index;
+                          }
+                          showOverlay();
+                        });
+
+                        if (controller.position.extentAfter > 0 ||
+                            unableScrollLetterIndex > index) {
+                          controller.jumpTo(contentOffsets.values.elementAt(index));
+                        }
+                      }
+                    }
+                  },
+                  onVerticalDragEnd: (details) {
+                    setState(() {
+                      isVerticalDrag = false;
+                      hideOverlay();
+                    });
+                  },
+                  onPanDown: (details) {
+                    // set scrollbar position in range [0..scroll height - scrollbarHeight] to avoid overrflow
+                    int index = (details.localPosition.dy / scrollbarHeight).floor();
+                    MapEntry<String, double> offsetMap = alphabetOffsets.entries.elementAt(index);
+                    setState(() {
+                      scrollbarPostition = offsetMap.value;
+                      currentLetter = offsetMap.key;
+                      showOverlay();
+                    });
+                    controller.jumpTo(contentOffsets.values.elementAt(index));
+                  },
+                  onPanCancel: () {
+                    setState(() {
+                      hideOverlay();
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.blueGrey.shade50,
+                    ),
+                    child: Stack(
+                      children: [
+                        AnimatedPositioned(
+                          // set scrollbar position to center when drag
+                          top: clampMaxScrollExtent(scrollbarPostition),
+                          duration:
+                              isVerticalDrag ? Duration.zero : const Duration(milliseconds: 150),
+                          child: Container(
+                            width: 15,
+                            height: scrollbarHeight,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.lightGreen,
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            for (int i = 0; i < alphabet.length; i++)
+                              Container(
+                                height: standardizedScrollbarHeight,
+                                decoration: i < alphabet.length - 1
+                                    ? const BoxDecoration(border: Border(bottom: BorderSide()))
+                                    : null,
+                                alignment: Alignment.center,
+                                child: Text(
+                                  alphabet.elementAt(i),
+                                  style: Theme.of(context).textTheme.labelMedium,
+                                ),
+                              )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            })
+          ],
+        ),
+        displayLetterOverlay(),
+      ],
+    );
   }
 
   @override
   void dispose() {
-    removeOverlay();
     controller.dispose();
     super.dispose();
   }
