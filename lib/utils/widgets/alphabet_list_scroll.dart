@@ -115,6 +115,9 @@ class _AlphabetListScrollState extends State<AlphabetListScroll> {
   /// The value is identity if the content part scrolls to end.
   int unableScrollLetterIndex = 0;
 
+  /// Whether letter is visible in the alphabet scroll line.
+  ///
+  /// Defaults to false.
   bool isLetterVisible = false;
 
   double clampMaxScrollExtent(double value) {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/widgets/alphabet_list_scroll.dart';
+
 class IngredientsForm extends StatelessWidget {
   const IngredientsForm({super.key});
 
@@ -49,15 +51,15 @@ class IngredientsForm extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
+        onPressed: () async {
+          String? result = await showModalBottomSheet<String>(
             context: context,
+            scrollControlDisabledMaxHeightRatio: 12 / 16,
             builder: (context) {
-              return Container(
-                color: Colors.amber,
-              );
+              return const AlphabetListScroll();
             },
           );
+          debugPrint("result: $result");
         },
         child: const Icon(Icons.add),
       ),

@@ -38,11 +38,16 @@ class ItemBlock extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 for (int i = 1; i <= numOfItem; i++)
-                  Container(
-                    height: itemExtent,
-                    padding: const EdgeInsets.all(16.0),
-                    alignment: Alignment.centerLeft,
-                    child: Text("Scrollable $label : Index $i"),
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context, "Scrollable $label : Index $i");
+                    },
+                    child: Container(
+                      height: itemExtent,
+                      padding: const EdgeInsets.all(16.0),
+                      alignment: Alignment.centerLeft,
+                      child: Text("Scrollable $label : Index $i"),
+                    ),
                   )
               ],
             ),

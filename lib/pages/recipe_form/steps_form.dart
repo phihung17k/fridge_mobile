@@ -11,6 +11,20 @@ class StepsForm extends StatefulWidget {
 class _StepsFormState extends State<StepsForm> {
   @override
   Widget build(BuildContext context) {
-    return AlphabetListScroll();
+    return ReorderableListView.builder(
+      itemCount: 3,
+      itemBuilder: (context, index) {
+        return Column(
+          key: ValueKey("reorder $index"),
+          children: [
+            TextField(
+              maxLines: null,
+            )
+          ],
+        );
+      },
+      onReorder: (oldIndex, newIndex) {},
+    );
+    // return AlphabetListScroll();
   }
 }

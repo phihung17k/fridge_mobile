@@ -76,9 +76,9 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
               ],
             ),
           ),
-          body: TabBarView(
+          body: const TabBarView(
             children: [
-              const OverviewForm(),
+              OverviewForm(),
               IngredientsForm(),
               StepsForm(),
             ],
