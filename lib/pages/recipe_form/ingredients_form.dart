@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_mobile/utils/proxy_decorator.dart';
 
 import '../../utils/widgets/alphabet_list_scroll.dart';
 
@@ -37,17 +38,7 @@ class IngredientsForm extends StatelessWidget {
         },
         onReorder: (oldIndex, newIndex) {},
         proxyDecorator: (child, index, animation) {
-          return AnimatedBuilder(
-            animation: animation,
-            builder: (BuildContext context, Widget? child) {
-              // animation's effect for reorder itemw
-              return Material(
-                color: Colors.transparent,
-                child: child,
-              );
-            },
-            child: child,
-          );
+          return ProxyDecorator(animation: animation, child: child);
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -59,7 +50,7 @@ class IngredientsForm extends StatelessWidget {
               return const AlphabetListScroll();
             },
           );
-          debugPrint("result: $result");
+          // debugPrint("result: $result");
         },
         child: const Icon(Icons.add),
       ),
