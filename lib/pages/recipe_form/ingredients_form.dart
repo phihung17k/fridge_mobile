@@ -15,7 +15,7 @@ class IngredientsForm extends StatelessWidget {
         itemCount: 5,
         itemBuilder: (context, index) {
           return Card(
-            key: Key("reorder item $index"),
+            key: ValueKey("reorder item $index"),
             elevation: 2,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             color: Colors.white,

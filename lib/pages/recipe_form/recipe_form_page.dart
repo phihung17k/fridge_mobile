@@ -37,51 +37,54 @@ class _RecipeFormPageState extends State<RecipeFormPage> {
       length: 3,
       initialIndex: 2,
       child: Form(
-        child: Scaffold(
-          appBar: AppBar(
-            leading: BackButton(
-              onPressed: () => Navigator.pop(context),
+        child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: Scaffold(
+            appBar: AppBar(
+              leading: BackButton(
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: const Text("Recipe Form"),
+              forceMaterialTransparency: true,
+              // scrolledUnderElevation: 2,
+              // surfaceTintColor: Colors.amber,
+              actions: [
+                // IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert_outlined)),
+                Builder(builder: (context) {
+                  return TextButton(
+                    onPressed: () {
+                      if (!Form.of(context).validate()) {
+                        ScaffoldMessengerState state = ScaffoldMessenger.of(context);
+                        state.removeCurrentSnackBar();
+                        state.showSnackBar(
+                          const SnackBar(
+                            content: Text('Processing Data'),
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text("Save"),
+                  );
+                }),
+              ],
+              bottom: const TabBar(
+                indicatorSize: TabBarIndicatorSize.tab,
+                tabs: <Widget>[
+                  Tab(text: "Overview"),
+                  Tab(text: "Ingredients"),
+                  Tab(text: "Steps"),
+                ],
+              ),
             ),
-            title: const Text("Recipe Form"),
-            forceMaterialTransparency: true,
-            // scrolledUnderElevation: 2,
-            // surfaceTintColor: Colors.amber,
-            actions: [
-              // IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert_outlined)),
-              Builder(builder: (context) {
-                return TextButton(
-                  onPressed: () {
-                    if (!Form.of(context).validate()) {
-                      ScaffoldMessengerState state = ScaffoldMessenger.of(context);
-                      state.removeCurrentSnackBar();
-                      state.showSnackBar(
-                        const SnackBar(
-                          content: Text('Processing Data'),
-                          duration: Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text("Save"),
-                );
-              }),
-            ],
-            bottom: const TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              tabs: <Widget>[
-                Tab(text: "Overview"),
-                Tab(text: "Ingredients"),
-                Tab(text: "Steps"),
+            body: const TabBarView(
+              children: [
+                OverviewForm(),
+                IngredientsForm(),
+                StepsForm(),
               ],
             ),
-          ),
-          body: const TabBarView(
-            children: [
-              OverviewForm(),
-              IngredientsForm(),
-              StepsForm(),
-            ],
           ),
         ),
       ),

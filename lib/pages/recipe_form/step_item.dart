@@ -16,7 +16,13 @@ class StepItem extends StatefulWidget {
 
 class _StepItemState extends State<StepItem> {
   final ImagePicker picker = ImagePicker();
-  final List<Future<XFile?>> images = [];
+  final List<XFile> images = [];
+  final TextEditingController textController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +32,10 @@ class _StepItemState extends State<StepItem> {
       color: Colors.transparent,
       child: Row(
         key: ValueKey("reorder Row ${widget.index}"),
+        spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            margin: const EdgeInsets.only(right: 20),
             constraints: const BoxConstraints(
               minHeight: 30,
               minWidth: 30,
@@ -42,12 +48,14 @@ class _StepItemState extends State<StepItem> {
           ),
           Expanded(
             child: Column(
+              spacing: 15,
               children: [
                 TextField(
+                  controller: textController,
                   decoration: const InputDecoration(
                     isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 8),
                   ),
+                  textInputAction: TextInputAction.done,
                   maxLines: null,
                   maxLength: 500,
                   buildCounter: (
@@ -65,20 +73,16 @@ class _StepItemState extends State<StepItem> {
                     );
                   },
                 ),
-                const SizedBox(height: 10),
                 Row(
+                  spacing: 15,
                   children: [
                     for (int i = 0; i < images.length; i++)
-                      FutureBuilder<XFile?>(
-                        future: images[i],
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData || snapshot.data == null || snapshot.hasError) {
-                            return const SizedBox();
-                          }
-                          return Container(
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
                             width: widget.imageWidth,
                             height: widget.imageHeight,
-                            margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
                               shape: BoxShape.rectangle,
                               borderRadius: BorderRadius.circular(10),
@@ -86,16 +90,35 @@ class _StepItemState extends State<StepItem> {
                             clipBehavior: Clip.hardEdge,
                             child: Image(
                               fit: BoxFit.cover,
-                              image: FileImage(File(snapshot.data!.path)),
+                              image: FileImage(File(images[i].path)),
                             ),
-                          );
-                        },
+                          ),
+                          Positioned(
+                            top: -22,
+                            right: -22,
+                            child: IconButton(
+                              color: Colors.red,
+                              // padding: EdgeInsets.zero,
+                              onPressed: () {
+                                images.removeAt(i);
+                                setState(() {});
+                              },
+                              icon: const Icon(Icons.remove_circle_rounded),
+                            ),
+                          ),
+                        ],
                       ),
                     if (images.length < 3)
                       IconButton(
                         onPressed: () {
-                          images.add(picker.pickImage(source: ImageSource.gallery));
-                          setState(() {});
+                          picker.pickImage(source: ImageSource.gallery).then(
+                            (value) {
+                              if (value != null) {
+                                images.add(value);
+                                setState(() {});
+                              }
+                            },
+                          );
                         },
                         icon: const Icon(Icons.add_photo_alternate_outlined),
                         style: IconButton.styleFrom(

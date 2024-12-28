@@ -11,7 +11,7 @@ class StepsForm extends StatefulWidget {
 }
 
 class _StepsFormState extends State<StepsForm> {
-  int counter = 1;
+  final List<int> items = [0, 1];
 
   @override
   void initState() {
@@ -24,27 +24,34 @@ class _StepsFormState extends State<StepsForm> {
     double imageHeight = MediaQuery.sizeOf(context).width / 5;
     return Scaffold(
       body: ReorderableListView.builder(
-        itemCount: counter,
+        itemCount: items.length,
         shrinkWrap: true,
         padding: const EdgeInsets.all(10.0),
         itemBuilder: (context, index) {
           return StepItem(
-            key: ValueKey("ReorderableListView $index"),
+            key: ValueKey("StepItem ${items[index]}"),
             imageWidth: imageWidth,
             imageHeight: imageHeight,
             index: index,
           );
         },
-        onReorder: (oldIndex, newIndex) {},
-        proxyDecorator: (child, index, animation) {
-          return ProxyDecorator(animation: animation, child: child);
+        onReorder: (oldIndex, newIndex) {
+          setState(() {
+            if (oldIndex < newIndex) {
+              newIndex -= 1;
+            }
+            final int item = items.removeAt(oldIndex);
+            items.insert(newIndex, item);
+          });
         },
+        // proxyDecorator: (child, index, animation) {
+        //   return ProxyDecorator(animation: animation, child: child);
+        // },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            counter++;
-          });
+          items.add(items.length);
+          setState(() {});
         },
         child: const Icon(Icons.add),
       ),
