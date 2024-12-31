@@ -1,10 +1,10 @@
-import 'package:fridge_mobile/blocs/home/home_bloc.dart';
-import 'package:fridge_mobile/blocs/main/main_bloc.dart';
 import 'package:get_it/get_it.dart';
+import '../blocs/blocs.dart';
 
 class BlocDependencies {
   static void setup(GetIt injector) {
     injector.registerFactory(() => MainBloc());
     injector.registerFactory(() => HomeBloc());
+    injector.registerFactory(() => RecipeFormBloc());
   }
 }

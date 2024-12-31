@@ -69,4 +69,10 @@ class _MainPageState extends BaseState<MainPage, HomeBloc> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 }

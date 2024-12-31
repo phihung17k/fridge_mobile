@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CookTimeDialog extends StatefulWidget {
-  final int initialHour;
-  final int initialMinute;
+  final int? initialHour;
+  final int? initialMinute;
   final double? labelItemExtent;
   final int itemCount;
   final double listWheelScrollWidth;
@@ -33,13 +33,27 @@ class CookTimeDialog extends StatefulWidget {
 class _CookTimeDialogState extends State<CookTimeDialog> {
   late FixedExtentScrollController _hourScrollController;
   late FixedExtentScrollController _minuteScrollController;
+  final int hourLength = 100;
+  final int minuteLength = 60;
+
+  int standardizeTime(int time, int length) {
+    /// fix error: get negative value when scroll reverse
+    /// if time = -1 mean time = length - 1
+    while (time < 0) {
+      time += length;
+    }
+    while (time > length) {
+      time -= length;
+    }
+    return time;
+  }
 
   @override
   void initState() {
     super.initState();
 
-    _hourScrollController = FixedExtentScrollController(initialItem: widget.initialHour);
-    _minuteScrollController = FixedExtentScrollController(initialItem: widget.initialMinute);
+    _hourScrollController = FixedExtentScrollController(initialItem: widget.initialHour!);
+    _minuteScrollController = FixedExtentScrollController(initialItem: widget.initialMinute!);
   }
 
   @override
@@ -54,8 +68,10 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop(context,
-                (_hourScrollController.selectedItem, _minuteScrollController.selectedItem));
+            Navigator.pop(context, (
+              standardizeTime(_hourScrollController.selectedItem, hourLength),
+              standardizeTime(_minuteScrollController.selectedItem, minuteLength),
+            ));
           },
           child: const Text("Ok"),
         )
@@ -106,7 +122,7 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
                           physics: const FixedExtentScrollPhysics(),
                           childDelegate: ListWheelChildLoopingListDelegate(
                             children: [
-                              for (int i = 0; i < 100; i++)
+                              for (int i = 0; i < hourLength; i++)
                                 Container(
                                   alignment: Alignment.center,
                                   child: Text(
@@ -137,7 +153,7 @@ class _CookTimeDialogState extends State<CookTimeDialog> {
                           physics: const FixedExtentScrollPhysics(),
                           childDelegate: ListWheelChildLoopingListDelegate(
                             children: [
-                              for (int i = 0; i < 60; i++)
+                              for (int i = 0; i < minuteLength; i++)
                                 Container(
                                   alignment: Alignment.center,
                                   child: Text(

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fridge_mobile/blocs/bloc_provider.dart';
+import 'package:fridge_mobile/blocs/recipe_form/recipe_form_bloc.dart';
 
 import 'cook_time_dialog.dart';
 
@@ -12,15 +15,8 @@ class OverviewForm extends StatefulWidget {
 class _OverviewFormState extends State<OverviewForm> with AutomaticKeepAliveClientMixin {
   late final TextEditingController _timeController;
   late final TextEditingController _servingController;
-  int hour = 0;
-  int minute = 0;
 
-  String combineTime(int hour, int minute) {
-    String result = "";
-    result = hour < 10 ? "0$hour" : "$hour";
-    result = minute < 10 ? "$result : 0$minute" : "$result : $minute";
-    return result;
-  }
+  RecipeFormBloc? bloc;
 
   @override
   bool get wantKeepAlive => true;
@@ -28,13 +24,34 @@ class _OverviewFormState extends State<OverviewForm> with AutomaticKeepAliveClie
   @override
   void initState() {
     super.initState();
-    _timeController = TextEditingController(text: combineTime(hour, minute));
+
+    _timeController = TextEditingController(text: "00:00");
     _servingController = TextEditingController(text: "1");
+  }
+
+  void showDurationDialog() {
+    showDialog<(int, int)>(
+      context: context,
+      builder: (context) {
+        return CookTimeDialog(
+          initialHour: bloc!.state.hour,
+          initialMinute: bloc!.state.minute,
+        );
+      },
+    ).then(
+      ((int, int)? value) {
+        if (value != null) {
+          bloc!.updateTimeFromDialog(value.$1, value.$2);
+          _timeController.text = bloc!.combineTime(value.$1, value.$2);
+        }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    bloc ??= BlocProvider.maybeOf<RecipeFormBloc>(context);
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -76,25 +93,7 @@ class _OverviewFormState extends State<OverviewForm> with AutomaticKeepAliveClie
                 prefix: null, // not use
                 contentPadding: EdgeInsets.all(15)), // fix prefix & content align
             textAlignVertical: TextAlignVertical.center, // fix prefix & content align
-            onTap: () {
-              showDialog<(int, int)>(
-                context: context,
-                builder: (context) {
-                  return CookTimeDialog(
-                    initialHour: hour,
-                    initialMinute: minute,
-                  );
-                },
-              ).then(
-                ((int, int)? value) {
-                  if (value != null) {
-                    hour = value.$1;
-                    minute = value.$2;
-                    _timeController.text = combineTime(value.$1, value.$2);
-                  }
-                },
-              );
-            },
+            onTap: () => showDurationDialog(),
           ),
           const SizedBox(height: 10),
           Text("Serving", style: Theme.of(context).textTheme.labelLarge),
