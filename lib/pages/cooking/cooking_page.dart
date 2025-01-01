@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fridge_mobile/routes.dart';
-import '../../models/ingredient_model.dart';
+import '../../models/selected_ingredient_model.dart';
 import 'badge_count.dart';
 
 class CookingPage extends StatefulWidget {
@@ -81,7 +81,7 @@ var x1 = GridView.builder(
   itemCount: 35,
   padding: const EdgeInsets.all(10),
   itemBuilder: (context, index) {
-    IngredientModel ingredient = const IngredientModel(
+    SelectedIngredientModel ingredient = const SelectedIngredientModel(
         id: 1, imageUrl: "assets/images/broccoli.png", isSelected: true, name: "Test");
     return InkWell(
       // onTap: () => bloc?.selectIngredient(index),

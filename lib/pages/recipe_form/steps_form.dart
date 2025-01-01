@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fridge_mobile/pages/recipe_form/step_item.dart';
 
-import '../../utils/proxy_decorator.dart';
-
 class StepsForm extends StatefulWidget {
   const StepsForm({super.key});
 

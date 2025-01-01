@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:fridge_mobile/models/ingredient_model.dart';
+import 'package:fridge_mobile/models/selected_ingredient_model.dart';
 import 'package:fridge_mobile/models/recipe_form/step_model.dart';
 
 class RecipeFormModel extends Equatable {
@@ -8,7 +8,7 @@ class RecipeFormModel extends Equatable {
   final String? description;
   final String? duration;
   final int? serving;
-  final List<IngredientModel>? ingredients;
+  final List<SelectedIngredientModel>? ingredients;
   final List<StepModel>? steps;
 
   const RecipeFormModel({
@@ -27,7 +27,7 @@ class RecipeFormModel extends Equatable {
     String? description,
     String? duration,
     int? serving,
-    List<IngredientModel>? ingredients,
+    List<SelectedIngredientModel>? ingredients,
     List<StepModel>? steps,
   }) {
     return RecipeFormModel(

@@ -4,13 +4,11 @@ class IngredientModel extends Equatable {
   final int? id;
   final String? name;
   final String? imageUrl;
-  final bool isSelected;
 
   const IngredientModel({
     this.id,
     this.name,
     this.imageUrl,
-    this.isSelected = false,
   });
 
   IngredientModel copyWith({
@@ -23,7 +21,6 @@ class IngredientModel extends Equatable {
       id: id ?? this.id,
       name: name ?? this.name,
       imageUrl: imageUrl ?? this.imageUrl,
-      isSelected: isSelected ?? this.isSelected,
     );
   }
 

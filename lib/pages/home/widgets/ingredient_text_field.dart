@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fridge_mobile/blocs/bloc_provider.dart';
 import 'package:fridge_mobile/blocs/home/home_bloc.dart';
 
-import '../../../models/ingredient_model.dart';
+import '../../../models/selected_ingredient_model.dart';
 
 class IngredientTextField extends StatelessWidget {
   IngredientTextField({super.key});
@@ -39,15 +39,15 @@ class IngredientTextField extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: StreamBuilder<List<IngredientModel>>(
+                  child: StreamBuilder<List<SelectedIngredientModel>>(
                       stream: bloc?.optionsStream,
                       builder: (context, snapshot) {
-                        List<IngredientModel> options = snapshot.data ?? [];
+                        List<SelectedIngredientModel> options = snapshot.data ?? [];
                         return ListView.builder(
                           shrinkWrap: true,
                           itemCount: options.length,
                           itemBuilder: (BuildContext context, int index) {
-                            final IngredientModel option = options[index];
+                            final SelectedIngredientModel option = options[index];
                             Color? color;
                             if (index == 0) {
                               color = Theme.of(context).focusColor;
