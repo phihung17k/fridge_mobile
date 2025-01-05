@@ -1,4 +1,4 @@
-import 'package:fridge_mobile/models/selected_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
 
 class Dump {
   static List<SelectedIngredientModel> dumpIngredients = const [

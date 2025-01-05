@@ -1,3 +1,4 @@
+import 'package:fridge_mobile/blocs/cooking/cooking_bloc.dart';
 import 'package:get_it/get_it.dart';
 import '../blocs/blocs.dart';
 
@@ -6,5 +7,6 @@ class BlocDependencies {
     injector.registerFactory(() => MainBloc());
     injector.registerFactory(() => HomeBloc());
     injector.registerFactory(() => RecipeFormBloc());
+    injector.registerFactory(() => CookingBloc(injector()));
   }
 }

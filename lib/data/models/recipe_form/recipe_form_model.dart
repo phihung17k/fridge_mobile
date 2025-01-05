@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:fridge_mobile/models/selected_ingredient_model.dart';
-import 'package:fridge_mobile/models/recipe_form/step_model.dart';
+import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/recipe_form/step_model.dart';
 
 class RecipeFormModel extends Equatable {
   final int? id;

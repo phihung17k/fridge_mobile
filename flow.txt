@@ -1,0 +1,5 @@
+Client: get, post
+Repository: call api login logout and get response
+Service: convert response to model
+Bloc: get model to change ui
+Page

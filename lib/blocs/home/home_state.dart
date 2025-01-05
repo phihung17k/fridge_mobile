@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../models/selected_ingredient_model.dart';
+import '../../data/models/selected_ingredient_model.dart';
 
 class HomeState extends Equatable {
   /// List of ingredient to select as a part of recipe

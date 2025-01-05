@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_mobile/blocs/cooking/cooking_bloc.dart';
+import 'package:fridge_mobile/pages/base_state.dart';
+import 'package:fridge_mobile/pages/cooking/ingredients_in_category.dart';
 import 'package:fridge_mobile/routes.dart';
-import '../../models/selected_ingredient_model.dart';
+import '../../data/models/ingredient_model.dart';
 import 'badge_count.dart';
 
 class CookingPage extends StatefulWidget {
@@ -10,7 +13,8 @@ class CookingPage extends StatefulWidget {
   State<CookingPage> createState() => _CookingPageState();
 }
 
-class _CookingPageState extends State<CookingPage> with SingleTickerProviderStateMixin {
+class _CookingPageState extends BaseState<CookingPage, CookingBloc>
+    with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
   @override
@@ -18,6 +22,7 @@ class _CookingPageState extends State<CookingPage> with SingleTickerProviderStat
     super.initState();
 
     _tabController = TabController(length: 6, vsync: this);
+    bloc.getIngredients();
   }
 
   @override
@@ -57,7 +62,21 @@ class _CookingPageState extends State<CookingPage> with SingleTickerProviderStat
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [x1, x1, x1, x1, x1, x1],
+        children: [
+          StreamBuilder<List<IngredientModel>>(
+              stream: bloc.ingredientListStream,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return IngredientsInCategory(ingredients: snapshot.data!);
+              }),
+          SizedBox(),
+          SizedBox(),
+          SizedBox(),
+          SizedBox(),
+          SizedBox()
+        ],
       ),
     );
   }
@@ -68,47 +87,3 @@ class _CookingPageState extends State<CookingPage> with SingleTickerProviderStat
     super.dispose();
   }
 }
-
-var x1 = GridView.builder(
-  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,
-    mainAxisSpacing: 5,
-    crossAxisSpacing: 5,
-    mainAxisExtent: 160,
-  ),
-  shrinkWrap: true,
-  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-  itemCount: 35,
-  padding: const EdgeInsets.all(10),
-  itemBuilder: (context, index) {
-    SelectedIngredientModel ingredient = const SelectedIngredientModel(
-        id: 1, imageUrl: "assets/images/broccoli.png", isSelected: true, name: "Test");
-    return InkWell(
-      // onTap: () => bloc?.selectIngredient(index),
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-          side: BorderSide(
-            width: ingredient.isSelected ? 5 : 0.1,
-            color: ingredient.isSelected ? Colors.blue : Colors.transparent,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: Image(
-                  image: AssetImage(ingredient.imageUrl!),
-                ),
-              ),
-              Text(ingredient.name!)
-            ],
-          ),
-        ),
-      ),
-    );
-  },
-);
