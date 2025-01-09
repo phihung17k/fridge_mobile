@@ -15,9 +15,7 @@ class IngredientRepository implements IIngredientRepository {
   @override
   Future<PagingResult<IngredientResponse>?> getIngredients() async {
     try {
-      // final Response response = await _client.getAsync(ApiPath.ingredients);
-      final Response response =
-          await _client.getAsync("/api/Ingredient/list?pageIndex=1&pageSize=10");
+      final Response response = await _client.getAsync(ApiPath.ingredients);
       if (response.statusCode != 200) {
         return null;
       }
