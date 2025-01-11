@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fridge_mobile/pages/home/widgets/option_chip.dart';
 import '../../../blocs/bloc_provider.dart';
 import '../../../blocs/home/home_bloc.dart';
-import '../../../models/ingredient_model.dart';
+import '../../../data/models/selected_ingredient_model.dart';
 
 class SelectedOptionChips extends StatelessWidget {
   const SelectedOptionChips({super.key});
@@ -12,10 +12,10 @@ class SelectedOptionChips extends StatelessWidget {
     HomeBloc? bloc = BlocProvider.maybeOf<HomeBloc>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: StreamBuilder<List<IngredientModel>>(
+      child: StreamBuilder<List<SelectedIngredientModel>>(
           stream: bloc?.selectedOptionsStream,
           builder: (context, snapshot) {
-            List<IngredientModel> ingredients = snapshot.data ?? [];
+            List<SelectedIngredientModel> ingredients = snapshot.data ?? [];
             return Wrap(
               spacing: 10,
               runSpacing: 5,

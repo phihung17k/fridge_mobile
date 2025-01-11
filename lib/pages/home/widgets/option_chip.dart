@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fridge_mobile/models/ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
 
 import '../../../blocs/bloc_provider.dart';
 import '../../../blocs/home/home_bloc.dart';
 import '../../../utils/app_color.dart';
 
 class OptionChip extends StatefulWidget {
-  final IngredientModel ingredient;
+  final SelectedIngredientModel ingredient;
   const OptionChip({super.key, required this.ingredient});
 
   @override
@@ -17,7 +17,7 @@ class _OptionChipState extends State<OptionChip> with SingleTickerProviderStateM
   late final AnimationController controller;
   late final Animation<double> scaleAnimation;
 
-  IngredientModel get ingredient => widget.ingredient;
+  SelectedIngredientModel get ingredient => widget.ingredient;
 
   @override
   void initState() {

@@ -1,0 +1,1 @@
+C:\android\test_dotnet\fridge_mobile\build\app\intermediates\cxx\Debug\144655e6\obj\arm64-v8a

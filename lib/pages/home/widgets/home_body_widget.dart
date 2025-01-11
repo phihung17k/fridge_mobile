@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../blocs/bloc_provider.dart';
 import '../../../blocs/home/home_bloc.dart';
-import '../../../models/ingredient_model.dart';
+import '../../../data/models/selected_ingredient_model.dart';
 
 class HomeBodyWidget extends StatelessWidget {
   const HomeBodyWidget({super.key});
@@ -18,10 +18,10 @@ class HomeBodyWidget extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 10),
-          StreamBuilder<List<IngredientModel>>(
+          StreamBuilder<List<SelectedIngredientModel>>(
             stream: bloc?.ingredientListStream,
             builder: (context, snapshot) {
-              List<IngredientModel>? ingredients = snapshot.data;
+              List<SelectedIngredientModel>? ingredients = snapshot.data;
               return GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
@@ -33,7 +33,7 @@ class HomeBodyWidget extends StatelessWidget {
                 physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                 itemCount: ingredients?.length ?? 0,
                 itemBuilder: (context, index) {
-                  IngredientModel ingredient = ingredients![index];
+                  SelectedIngredientModel ingredient = ingredients![index];
                   return InkWell(
                     onTap: () => bloc?.selectIngredient(index),
                     child: Card(

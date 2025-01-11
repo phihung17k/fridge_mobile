@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-abstract class BaseBloc<T extends dynamic> {
+abstract class BaseBloc<T extends Object> {
   late BehaviorSubject<T> _controller;
   late BehaviorSubject<bool> _loadingController;
 
