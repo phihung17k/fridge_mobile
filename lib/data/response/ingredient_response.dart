@@ -1,5 +1,5 @@
 class IngredientResponse {
-  final int id;
+  final String id;
   final String? name;
   final String? localName;
   final String? description;

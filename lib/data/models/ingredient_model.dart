@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class IngredientModel extends Equatable {
-  final int? id;
+  final String? id;
   final String? name;
   final String? localName;
   final String? description;
@@ -16,7 +16,7 @@ class IngredientModel extends Equatable {
   });
 
   IngredientModel copyWith({
-    int? id,
+    String? id,
     String? name,
     String? localName,
     String? description,

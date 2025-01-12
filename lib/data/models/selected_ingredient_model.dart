@@ -15,7 +15,7 @@ class SelectedIngredientModel extends IngredientModel {
   @override
   @override
   SelectedIngredientModel copyWith({
-    int? id,
+    String? id,
     String? name,
     String? localName,
     String? description,
