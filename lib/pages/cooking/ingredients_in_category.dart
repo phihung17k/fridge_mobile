@@ -1,59 +1,104 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import '../../blocs/bloc_provider.dart';
+import '../../blocs/cooking/cooking_bloc.dart';
 import '../../data/models/ingredient_model.dart';
 
-class IngredientsInCategory extends StatelessWidget {
-  final List<IngredientModel> ingredients;
+class IngredientsInCategory extends StatefulWidget {
+  const IngredientsInCategory({super.key});
 
-  const IngredientsInCategory({super.key, required this.ingredients});
+  @override
+  State<IngredientsInCategory> createState() => _IngredientsInCategoryState();
+}
+
+class _IngredientsInCategoryState extends State<IngredientsInCategory> {
+  late final ScrollController scrollController;
+  late CookingBloc? bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController = ScrollController();
+
+    scrollController.addListener(
+      () {
+        if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+          log("LOAD MORE - current page index: ${bloc?.state.pageIndex}");
+          bloc?.getIngredients();
+        }
+      },
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    bloc = BlocProvider.maybeOf<CookingBloc>(context)!;
+    bloc?.getIngredients();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 5,
-        crossAxisSpacing: 5,
-        mainAxisExtent: 160,
-      ),
-      shrinkWrap: true,
-      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      itemCount: ingredients.length,
-      padding: const EdgeInsets.all(10),
-      itemBuilder: (context, index) {
-        IngredientModel ingredient = ingredients[index];
-        // const IngredientModel(
-        //     id: 1, imageUrl: "assets/images/broccoli.png", isSelected: true, name: "Test");
-        return InkWell(
-          // onTap: () => bloc?.selectIngredient(index),
-          child: Card(
-            elevation: 3,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-              side: BorderSide(
-                // width: ingredient.isSelected ? 5 : 0.1,
-                // color: ingredient.isSelected ? Colors.blue : Colors.transparent,
-                width: 0.1,
-                color: Colors.transparent,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: Image(
-                      image: AssetImage(ingredient.imageUrl ?? "assets/images/broccoli.png"),
-                    ),
-                  ),
-                  Text(ingredient.name!)
-                ],
-              ),
-            ),
+    return StreamBuilder<List<IngredientModel>>(
+      stream: bloc?.ingredientListStream,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        List<IngredientModel> ingredients = snapshot.data!;
+        return GridView.builder(
+          controller: scrollController,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 5,
+            crossAxisSpacing: 5,
+            mainAxisExtent: 160,
           ),
+          shrinkWrap: true,
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          itemCount: ingredients.length,
+          padding: const EdgeInsets.all(10),
+          itemBuilder: (context, index) {
+            IngredientModel ingredient = ingredients[index];
+            return InkWell(
+              // onTap: () => bloc?.selectIngredient(index),
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  side: BorderSide(
+                    // width: ingredient.isSelected ? 5 : 0.1,
+                    // color: ingredient.isSelected ? Colors.blue : Colors.transparent,
+                    width: 0.1,
+                    color: Colors.transparent,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: Image(
+                          image: AssetImage(ingredient.imageUrl ?? "assets/images/broccoli.png"),
+                        ),
+                      ),
+                      Text(ingredient.name!)
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 }

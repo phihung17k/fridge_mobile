@@ -26,7 +26,7 @@ class _OptionChipState extends State<OptionChip> with SingleTickerProviderStateM
     controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     scaleAnimation = Tween<double>(begin: 0, end: 1).animate(controller);
 
-    WidgetsBinding.instance.addPostFrameCallback(
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback(
       (_) {
         controller.forward();
       },

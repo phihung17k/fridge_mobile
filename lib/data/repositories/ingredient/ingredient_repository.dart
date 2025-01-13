@@ -13,9 +13,14 @@ class IngredientRepository implements IIngredientRepository {
   IngredientRepository(this._client);
 
   @override
-  Future<PagingResult<IngredientResponse>?> getIngredients() async {
+  Future<PagingResult<IngredientResponse>?> getIngredients(int pageIndex) async {
     try {
-      final Response response = await _client.getAsync(ApiPath.ingredients);
+      Map<String, dynamic> queryParameters = {
+        "pageIndex": "$pageIndex",
+        "pageSize": "10",
+      };
+      Uri uri = ApiPath.getUri(path: ApiPath.ingredients, queryParameters: queryParameters);
+      final Response response = await _client.getAsync(uri);
       if (response.statusCode != 200) {
         return null;
       }

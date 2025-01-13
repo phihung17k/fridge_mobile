@@ -17,20 +17,19 @@ class AppClient {
   }
 
   void logResponse(Response response) {
-    log("Response: ${response.toString()}");
-    log("Status Code:${response.statusCode}");
+    // log("Response: ${response.toString()}");
+    log("Status Code: ${response.statusCode}");
     log("Headers: ${response.headers}");
     log("Body: ${response.body}");
   }
 
-  Future<Response> getAsync(String url) async {
-    // String path = ApiPath.getUrl(url);
+  Future<Response> getAsync(Uri uri) async {
     // String path = "http://192.168.100.12:5091/api/Ingredient/list?pageIndex=1&pageSize=10";
-    String path = "https://192.168.100.12:7160/api/Ingredient/list?pageIndex=1&pageSize=10";
+    // String path = "http://192.168.1.115:5091/api/Ingredient/list?pageIndex=1&pageSize=10";
     log("------------------start------------------");
-    log('GET Request: $path');
+    log('GET Request: $uri');
     Response response = await get(
-      Uri.parse(path),
+      uri,
       headers: {
         "Content-Type": "application/json",
         // "charset": "utf-8",

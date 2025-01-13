@@ -11,8 +11,8 @@ class IngredientService implements IIngredientService {
   IngredientService(this.repository);
 
   @override
-  Future<PagingResult<IngredientModel>?> getIngredients() async {
-    PagingResult<IngredientResponse>? response = await repository.getIngredients();
+  Future<PagingResult<IngredientModel>?> getIngredients(int? pageIndex) async {
+    PagingResult<IngredientResponse>? response = await repository.getIngredients(pageIndex ?? 1);
     if (response == null) {
       return null;
     }
