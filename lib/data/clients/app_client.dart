@@ -24,8 +24,6 @@ class AppClient {
   }
 
   Future<Response> getAsync(Uri uri) async {
-    // String path = "http://192.168.100.12:5091/api/Ingredient/list?pageIndex=1&pageSize=10";
-    // String path = "http://192.168.1.115:5091/api/Ingredient/list?pageIndex=1&pageSize=10";
     log("------------------start------------------");
     log('GET Request: $uri');
     Response response = await get(

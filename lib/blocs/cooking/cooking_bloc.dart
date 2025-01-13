@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fridge_mobile/blocs/base_bloc.dart';
 import 'package:fridge_mobile/data/services/ingredient/i_ingredient_service.dart';
 
@@ -13,14 +15,15 @@ class CookingBloc extends BaseBloc<CookingState> {
   Stream<List<IngredientModel>> get ingredientListStream =>
       stateStream.map((state) => state.ingredients!).distinct();
 
-  void getIngredients() async {
+  void getIngredients({int? pageIndex}) async {
     if (state.hasNext == false) {
       return;
     }
-
+    log("LOAD MORE - current page index: ${state.pageIndex}");
     load(true);
+
     PagingResult<IngredientModel>? ingredientsPageResult =
-        await ingredientService.getIngredients(state.pageIndex! + 1);
+        await ingredientService.getIngredients(pageIndex ?? state.pageIndex! + 1);
 
     if (ingredientsPageResult == null) {
       load(false);

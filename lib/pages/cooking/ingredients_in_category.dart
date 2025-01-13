@@ -24,7 +24,6 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
     scrollController.addListener(
       () {
         if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-          log("LOAD MORE - current page index: ${bloc?.state.pageIndex}");
           bloc?.getIngredients();
         }
       },
@@ -35,7 +34,7 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     bloc = BlocProvider.maybeOf<CookingBloc>(context)!;
-    bloc?.getIngredients();
+    bloc?.getIngredients(pageIndex: 1);
   }
 
   @override
@@ -47,50 +46,57 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
           return const Center(child: CircularProgressIndicator());
         }
         List<IngredientModel> ingredients = snapshot.data!;
-        return GridView.builder(
+        return Scrollbar(
           controller: scrollController,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
-            mainAxisExtent: 160,
-          ),
-          shrinkWrap: true,
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          itemCount: ingredients.length,
-          padding: const EdgeInsets.all(10),
-          itemBuilder: (context, index) {
-            IngredientModel ingredient = ingredients[index];
-            return InkWell(
-              // onTap: () => bloc?.selectIngredient(index),
-              child: Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: BorderSide(
-                    // width: ingredient.isSelected ? 5 : 0.1,
-                    // color: ingredient.isSelected ? Colors.blue : Colors.transparent,
-                    width: 0.1,
-                    color: Colors.transparent,
+          thumbVisibility: true,
+          child: GridView.builder(
+            controller: scrollController,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 5,
+              crossAxisSpacing: 5,
+              mainAxisExtent: 160,
+            ),
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            itemCount: ingredients.length,
+            padding: const EdgeInsets.all(10),
+            itemBuilder: (context, index) {
+              IngredientModel ingredient = ingredients[index];
+              return InkWell(
+                // onTap: () => bloc?.selectIngredient(index),
+                child: Card(
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    side: BorderSide(
+                      // width: ingredient.isSelected ? 5 : 0.1,
+                      // color: ingredient.isSelected ? Colors.blue : Colors.transparent,
+                      width: 0.1,
+                      color: Colors.transparent,
+                    ),
                   ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: Image(
-                          image: AssetImage(ingredient.imageUrl ?? "assets/images/broccoli.png"),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Image(
+                            image: AssetImage(ingredient.imageUrl ?? "assets/images/broccoli.png"),
+                          ),
                         ),
-                      ),
-                      Text(ingredient.name!)
-                    ],
+                        Text(
+                          ingredient.name!,
+                          textAlign: TextAlign.center,
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );
