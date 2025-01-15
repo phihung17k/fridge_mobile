@@ -109,14 +109,24 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData && snapshot.data == true) {
                       debugPrint("LOAD MORE");
-                      return const Center(child: CircularProgressIndicator());
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
                     }
                     debugPrint("NO LOAD MORE");
-                    return const SizedBox(
-                      height: 10,
-                    );
+                    return const SizedBox();
+
+                    // return AnimatedSize(
+                    //   duration: Duration(seconds: 1),
+                    //   child: SizedBox(
+                    //     height: snapshot.hasData && snapshot.data == true ? 50 : 0,
+                    //     child: Center(child: CircularProgressIndicator()),
+                    //   ),
+                    // );
+
                     // return AnimatedSwitcher(
-                    //   duration: Duration(milliseconds: 500),
+                    //   duration: Duration(seconds: 1),
                     //   child: snapshot.hasData && snapshot.data == true
                     //       ? Center(child: CircularProgressIndicator())
                     //       : SizedBox.shrink(), // Hides when not loading

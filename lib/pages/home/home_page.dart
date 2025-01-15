@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_mobile/routes.dart';
 import '../../animations/shimmer_loading.dart';
 import '../../utils/string_constant.dart';
 
@@ -9,8 +10,12 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   bool _isLoading = true;
+
+  late final TabController tabController;
+  late final PageController pageController;
 
   @override
   bool get wantKeepAlive => true;
@@ -19,6 +24,9 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   void initState() {
     super.initState();
     // bloc.loadIngredients();
+
+    pageController = PageController();
+    tabController = TabController(length: 2, vsync: this);
 
     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback(
       (timeStamp) {
@@ -39,41 +47,96 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     // double widthPer3 = MediaQuery.sizeOf(context).width / 3;
     super.build(context); // Must call super.build when using AutomaticKeepAliveClientMixin
     return Scaffold(
-      backgroundColor: Colors.lightGreen,
+      // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       body: SafeArea(
         child: Container(
-          width: double.maxFinite,
-          height: double.maxFinite,
-          margin: const EdgeInsets.all(20),
-          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(15),
+            gradient: LinearGradient(
+              colors: [
+                // Theme.of(context).colorScheme.secondary,
+                // Theme.of(context).colorScheme.secondaryContainer
+                Color.fromARGB(255, 93, 185, 150),
+                Color.fromARGB(255, 227, 240, 175),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              // tileMode: TileMode.mirror,
+              // stops: [0.4, 1],
+            ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Craft Delicious Meals with What You Have!",
-                textAlign: TextAlign.center,
-                maxLines: null,
-                style: TextTheme.of(context).headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade600),
-                child: Text(
-                  "Get started",
-                  style: TextTheme.of(context).bodyLarge?.copyWith(
-                        color: Colors.white,
+          child: Container(
+            width: double.maxFinite,
+            height: double.maxFinite,
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 30,
+              children: [
+                Text(
+                  "Craft Delicious Meals with What You Have!",
+                  textAlign: TextAlign.center,
+                  maxLines: null,
+                  style: TextTheme.of(context).headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onInverseSurface,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
-              )
-            ],
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: PageView.builder(
+                          controller: pageController,
+                          itemCount: 2,
+                          onPageChanged: (value) {
+                            tabController.animateTo(value);
+                          },
+                          itemBuilder: (context, index) {
+                            String imageName =
+                                index == 0 ? "ice_cream.jpg" : "chocolate-molten.jpg";
+                            return Image(
+                              image: AssetImage("assets/images/$imageName"),
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10,
+                        child: TabPageSelector(
+                          controller: tabController,
+                          color: Theme.of(context).colorScheme.surface,
+                          selectedColor: Theme.of(context).colorScheme.inversePrimary,
+                          // indicatorSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, Routes.cooking);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                  ),
+                  child: Text(
+                    "Get started",
+                    style: TextTheme.of(context).bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -128,15 +191,15 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
       //             child: Column(
       //               children: [
       //                 RepaintBoundary(
-      //                   child: ShimmerLoading(
-      //                     isLoading: _isLoading,
-      //                     child: Image.asset(
-      //                       "assets/images/lean_pork.png",
-      //                       width: widthPer3,
-      //                       cacheWidth: widthPer3.round(),
-      //                     ),
-      //                   ),
-      //                 ),
+      //   child: ShimmerLoading(
+      //     isLoading: _isLoading,
+      //     child: Image.asset(
+      //       "assets/images/lean_pork.png",
+      //       width: widthPer3,
+      //       cacheWidth: widthPer3.round(),
+      //     ),
+      //   ),
+      // ),
       //                 Text(
       //                   "Thịt lợn tươi sống tái chanh năm 1999",
       //                   style: Theme.of(context)

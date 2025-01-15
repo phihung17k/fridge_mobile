@@ -93,7 +93,8 @@ class _ShimmerLoadingState extends State<ShimmerLoading> with TickerProviderStat
 
   @override
   void dispose() {
-    shimmerController.dispose();
+    // if
+    // shimmerController.dispose();
     fadeController.dispose();
     super.dispose();
   }

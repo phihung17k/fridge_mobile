@@ -21,7 +21,6 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
   @override
   void initState() {
     super.initState();
-
     _tabController = TabController(length: 6, vsync: this);
   }
 

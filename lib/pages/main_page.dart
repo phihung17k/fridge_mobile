@@ -15,7 +15,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends BaseState<MainPage, HomeBloc> {
   List<(IconData selectedIcon, IconData icon, String label)> destinations = [
     (Icons.home, Icons.home_outlined, "Home"),
-    (Icons.local_fire_department, Icons.local_fire_department_outlined, "Cook"),
+    // (Icons.local_fire_department, Icons.local_fire_department_outlined, "Cook"),
     (Icons.bookmark, Icons.bookmark_outline, "Saved"),
     (Icons.library_books, Icons.library_books_outlined, "Recipe"),
     (Icons.person, Icons.person_outlined, "Profile")
@@ -38,7 +38,7 @@ class _MainPageState extends BaseState<MainPage, HomeBloc> {
           controller: _pageController,
           children: [
             GetIt.I.get<Widget>(instanceName: Routes.home),
-            GetIt.I.get<Widget>(instanceName: Routes.cooking),
+            // GetIt.I.get<Widget>(instanceName: Routes.cooking),
             GetIt.I.get<Widget>(instanceName: Routes.saved),
             GetIt.I.get<Widget>(instanceName: Routes.recipe),
             GetIt.I.get<Widget>(instanceName: Routes.profile),
