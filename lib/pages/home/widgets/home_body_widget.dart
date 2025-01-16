@@ -18,10 +18,10 @@ class HomeBodyWidget extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 10),
-          StreamBuilder<List<SelectedIngredientModel>>(
+          StreamBuilder<List<SelectableIngredientModel>>(
             stream: bloc?.ingredientListStream,
             builder: (context, snapshot) {
-              List<SelectedIngredientModel>? ingredients = snapshot.data;
+              List<SelectableIngredientModel>? ingredients = snapshot.data;
               return GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
@@ -33,7 +33,7 @@ class HomeBodyWidget extends StatelessWidget {
                 physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                 itemCount: ingredients?.length ?? 0,
                 itemBuilder: (context, index) {
-                  SelectedIngredientModel ingredient = ingredients![index];
+                  SelectableIngredientModel ingredient = ingredients![index];
                   return InkWell(
                     onTap: () => bloc?.selectIngredient(index),
                     child: Card(

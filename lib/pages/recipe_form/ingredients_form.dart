@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fridge_mobile/utils/proxy_decorator.dart';
-
 import '../../utils/widgets/alphabet_list_scroll.dart';
 
 class IngredientsForm extends StatelessWidget {

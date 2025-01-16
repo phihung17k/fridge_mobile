@@ -39,15 +39,15 @@ class IngredientTextField extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: StreamBuilder<List<SelectedIngredientModel>>(
+                  child: StreamBuilder<List<SelectableIngredientModel>>(
                       stream: bloc?.optionsStream,
                       builder: (context, snapshot) {
-                        List<SelectedIngredientModel> options = snapshot.data ?? [];
+                        List<SelectableIngredientModel> options = snapshot.data ?? [];
                         return ListView.builder(
                           shrinkWrap: true,
                           itemCount: options.length,
                           itemBuilder: (BuildContext context, int index) {
-                            final SelectedIngredientModel option = options[index];
+                            final SelectableIngredientModel option = options[index];
                             Color? color;
                             if (index == 0) {
                               color = Theme.of(context).focusColor;

@@ -8,7 +8,7 @@ class RecipeFormModel extends Equatable {
   final String? description;
   final String? duration;
   final int? serving;
-  final List<SelectedIngredientModel>? ingredients;
+  final List<SelectableIngredientModel>? ingredients;
   final List<StepModel>? steps;
 
   const RecipeFormModel({
@@ -27,7 +27,7 @@ class RecipeFormModel extends Equatable {
     String? description,
     String? duration,
     int? serving,
-    List<SelectedIngredientModel>? ingredients,
+    List<SelectableIngredientModel>? ingredients,
     List<StepModel>? steps,
   }) {
     return RecipeFormModel(

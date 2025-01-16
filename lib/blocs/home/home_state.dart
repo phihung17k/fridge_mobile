@@ -4,22 +4,22 @@ import '../../data/models/selected_ingredient_model.dart';
 
 class HomeState extends Equatable {
   /// List of ingredient to select as a part of recipe
-  final List<SelectedIngredientModel>? ingredients;
+  final List<SelectableIngredientModel>? ingredients;
 
   /// Assume [options] includes all ingredients.
   /// Use to display in OverlayPortal when input matches ingredient's name.
-  final List<SelectedIngredientModel>? options;
+  final List<SelectableIngredientModel>? options;
 
-  final List<SelectedIngredientModel>? selectedOptions;
-  final List<SelectedIngredientModel>? remainingOptions;
+  final List<SelectableIngredientModel>? selectedOptions;
+  final List<SelectableIngredientModel>? remainingOptions;
 
   const HomeState({this.ingredients, this.options, this.selectedOptions, this.remainingOptions});
 
   HomeState copyWith(
-      {List<SelectedIngredientModel>? ingredients,
-      List<SelectedIngredientModel>? options,
-      List<SelectedIngredientModel>? selectedOptions,
-      List<SelectedIngredientModel>? remainingOptions}) {
+      {List<SelectableIngredientModel>? ingredients,
+      List<SelectableIngredientModel>? options,
+      List<SelectableIngredientModel>? selectedOptions,
+      List<SelectableIngredientModel>? remainingOptions}) {
     return HomeState(
       ingredients: ingredients ?? this.ingredients,
       options: options ?? this.options,

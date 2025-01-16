@@ -3,6 +3,7 @@ import 'package:fridge_mobile/data/response/ingredient_response.dart';
 import 'package:fridge_mobile/data/services/ingredient/i_ingredient_service.dart';
 import 'package:fridge_mobile/data/models/ingredient_model.dart';
 
+import '../../models/selected_ingredient_model.dart';
 import '../../paging_result.dart';
 
 class IngredientService implements IIngredientService {
@@ -16,6 +17,7 @@ class IngredientService implements IIngredientService {
     if (response == null) {
       return null;
     }
+
     return PagingResult<IngredientModel>(
       totalItemsCount: response.totalItemsCount,
       pageCount: response.pageCount,
@@ -25,6 +27,32 @@ class IngredientService implements IIngredientService {
       hasPrevious: response.hasPrevious,
       items: response.items
           .map((item) => IngredientModel(
+                id: item.id,
+                name: item.name,
+                localName: item.localName,
+                description: item.description,
+                imageUrl: item.imageUrl,
+              ))
+          .toList(),
+    );
+  }
+
+  @override
+  Future<PagingResult<SelectableIngredientModel>?> getSelectableIngredients(int? pageIndex) async {
+    PagingResult<IngredientResponse>? response = await repository.getIngredients(pageIndex ?? 1);
+    if (response == null) {
+      return null;
+    }
+
+    return PagingResult<SelectableIngredientModel>(
+      totalItemsCount: response.totalItemsCount,
+      pageCount: response.pageCount,
+      pageSize: response.pageSize,
+      pageIndex: response.pageIndex,
+      hasNext: response.hasNext,
+      hasPrevious: response.hasPrevious,
+      items: response.items
+          .map((item) => SelectableIngredientModel(
                 id: item.id,
                 name: item.name,
                 localName: item.localName,

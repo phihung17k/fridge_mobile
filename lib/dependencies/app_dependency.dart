@@ -1,10 +1,8 @@
-import 'dart:developer';
-
-import 'package:fridge_mobile/data/clients/app_client.dart';
-import 'package:fridge_mobile/dependencies/bloc_dependency.dart';
-import 'package:fridge_mobile/dependencies/repository_dependency.dart';
 import 'package:get_it/get_it.dart';
+import '../data/clients/app_client.dart';
+import 'bloc_dependency.dart';
 import 'page_dependency.dart';
+import 'repository_dependency.dart';
 import 'service_dependency.dart';
 
 class AppDependencies {

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fridge_mobile/routes.dart';
-import '../../animations/shimmer_loading.dart';
-import '../../utils/string_constant.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -50,7 +48,7 @@ class _HomePageState extends State<HomePage>
       // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       body: SafeArea(
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
                 // Theme.of(context).colorScheme.secondary,

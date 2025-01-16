@@ -1,9 +1,9 @@
 import 'package:fridge_mobile/data/models/ingredient_model.dart';
 
-class SelectedIngredientModel extends IngredientModel {
+class SelectableIngredientModel extends IngredientModel {
   final bool isSelected;
 
-  const SelectedIngredientModel({
+  const SelectableIngredientModel({
     super.id,
     super.name,
     super.localName,
@@ -13,8 +13,7 @@ class SelectedIngredientModel extends IngredientModel {
   });
 
   @override
-  @override
-  SelectedIngredientModel copyWith({
+  SelectableIngredientModel copyWith({
     String? id,
     String? name,
     String? localName,
@@ -22,7 +21,7 @@ class SelectedIngredientModel extends IngredientModel {
     String? imageUrl,
     bool? isSelected,
   }) {
-    return SelectedIngredientModel(
+    return SelectableIngredientModel(
       id: id ?? this.id,
       name: name ?? this.name,
       localName: localName ?? this.localName,

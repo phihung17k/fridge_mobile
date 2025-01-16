@@ -4,7 +4,6 @@ import 'package:fridge_mobile/blocs/cooking/cooking_bloc.dart';
 import 'package:fridge_mobile/pages/base_state.dart';
 import 'package:fridge_mobile/pages/cooking/ingredients_in_category.dart';
 import 'package:fridge_mobile/routes.dart';
-import '../../data/models/ingredient_model.dart';
 import 'badge_count.dart';
 
 class CookingPage extends StatefulWidget {

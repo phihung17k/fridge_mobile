@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart';
-import 'api_path.dart';
 
 class AppClient {
   String? parseToString(Response response) {

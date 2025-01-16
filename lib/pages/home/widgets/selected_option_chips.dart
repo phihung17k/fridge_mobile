@@ -12,10 +12,10 @@ class SelectedOptionChips extends StatelessWidget {
     HomeBloc? bloc = BlocProvider.maybeOf<HomeBloc>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: StreamBuilder<List<SelectedIngredientModel>>(
+      child: StreamBuilder<List<SelectableIngredientModel>>(
           stream: bloc?.selectedOptionsStream,
           builder: (context, snapshot) {
-            List<SelectedIngredientModel> ingredients = snapshot.data ?? [];
+            List<SelectableIngredientModel> ingredients = snapshot.data ?? [];
             return Wrap(
               spacing: 10,
               runSpacing: 5,

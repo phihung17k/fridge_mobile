@@ -1,9 +1,8 @@
 import 'package:equatable/equatable.dart';
-
-import '../../data/models/ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
 
 class CookingState extends Equatable {
-  final List<IngredientModel>? ingredients;
+  final List<SelectableIngredientModel>? ingredients;
   final bool? hasNext;
   final int? pageIndex;
   final bool? isLoadMore;
@@ -16,7 +15,7 @@ class CookingState extends Equatable {
   });
 
   CookingState copyWith({
-    List<IngredientModel>? ingredients,
+    List<SelectableIngredientModel>? ingredients,
     bool? hasNext,
     int? pageIndex,
     bool? isLoadMore,

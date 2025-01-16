@@ -6,7 +6,7 @@ import '../../../blocs/home/home_bloc.dart';
 import '../../../utils/app_color.dart';
 
 class OptionChip extends StatefulWidget {
-  final SelectedIngredientModel ingredient;
+  final SelectableIngredientModel ingredient;
   const OptionChip({super.key, required this.ingredient});
 
   @override
@@ -17,7 +17,7 @@ class _OptionChipState extends State<OptionChip> with SingleTickerProviderStateM
   late final AnimationController controller;
   late final Animation<double> scaleAnimation;
 
-  SelectedIngredientModel get ingredient => widget.ingredient;
+  SelectableIngredientModel get ingredient => widget.ingredient;
 
   @override
   void initState() {

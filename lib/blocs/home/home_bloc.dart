@@ -12,12 +12,12 @@ class HomeBloc extends BaseBloc<HomeState> {
           remainingOptions: [],
         ));
 
-  Stream<List<SelectedIngredientModel>> get ingredientListStream =>
+  Stream<List<SelectableIngredientModel>> get ingredientListStream =>
       stateStream.map((state) => state.ingredients!).distinct();
 
-  Stream<List<SelectedIngredientModel>> get optionsStream =>
+  Stream<List<SelectableIngredientModel>> get optionsStream =>
       stateStream.map((state) => state.options!);
-  Stream<List<SelectedIngredientModel>> get selectedOptionsStream =>
+  Stream<List<SelectableIngredientModel>> get selectedOptionsStream =>
       stateStream.map((state) => state.selectedOptions!);
 
   void loadIngredients() {
@@ -29,8 +29,8 @@ class HomeBloc extends BaseBloc<HomeState> {
   }
 
   void selectIngredient(int index) {
-    List<SelectedIngredientModel> ingredients = state.ingredients!.toList();
-    SelectedIngredientModel ingredient = state.ingredients![index];
+    List<SelectableIngredientModel> ingredients = state.ingredients!.toList();
+    SelectableIngredientModel ingredient = state.ingredients![index];
     ingredients[index] = ingredient.copyWith(isSelected: !ingredient.isSelected);
     emit(state.copyWith(ingredients: ingredients));
   }
@@ -42,8 +42,8 @@ class HomeBloc extends BaseBloc<HomeState> {
   // }
 
   void filterOptions(String value) {
-    List<SelectedIngredientModel> options = state.remainingOptions!.toList();
-    List<SelectedIngredientModel> filteredOptions =
+    List<SelectableIngredientModel> options = state.remainingOptions!.toList();
+    List<SelectableIngredientModel> filteredOptions =
         options.where((item) => item.name!.toLowerCase().contains(value.toLowerCase())).toList();
     emit(state.copyWith(options: filteredOptions));
   }
@@ -51,11 +51,11 @@ class HomeBloc extends BaseBloc<HomeState> {
   /// Tasks:
   /// - update list of selected options
   /// - remove the selected one in list of remaining options
-  void selectOption(SelectedIngredientModel option) {
-    List<SelectedIngredientModel> selectedOptions = state.selectedOptions!.toList();
+  void selectOption(SelectableIngredientModel option) {
+    List<SelectableIngredientModel> selectedOptions = state.selectedOptions!.toList();
     selectedOptions.add(option);
 
-    List<SelectedIngredientModel> remainingOptions = state.remainingOptions!.toList();
+    List<SelectableIngredientModel> remainingOptions = state.remainingOptions!.toList();
     remainingOptions.remove(option);
 
     emit(state.copyWith(selectedOptions: selectedOptions, remainingOptions: remainingOptions));
@@ -64,11 +64,11 @@ class HomeBloc extends BaseBloc<HomeState> {
   /// Tasks:
   /// - update list of remaining options
   /// - remove the selected option in list of selected options
-  void restoreOption(SelectedIngredientModel option) {
-    List<SelectedIngredientModel> remainingOptions = state.remainingOptions!.toList();
+  void restoreOption(SelectableIngredientModel option) {
+    List<SelectableIngredientModel> remainingOptions = state.remainingOptions!.toList();
     remainingOptions.add(option);
 
-    List<SelectedIngredientModel> selectedOptions = state.selectedOptions!.toList();
+    List<SelectableIngredientModel> selectedOptions = state.selectedOptions!.toList();
     selectedOptions.remove(option);
 
     emit(state.copyWith(selectedOptions: selectedOptions, remainingOptions: remainingOptions));
