@@ -17,6 +17,28 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
+  final List<String> dump = [
+    "All",
+    "Category 1",
+    "Category 2",
+    "Category 3",
+    "Category 4",
+    "Category 5",
+    "Category 5",
+    "Category 6",
+    "Category 7",
+    "Category 8",
+    "Category 9",
+    "Category 10",
+    "Category 11",
+    "Category 12",
+    "Category 13",
+    "Category 14",
+    "Category 15",
+    "Category 16",
+    "Category 18"
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -43,32 +65,23 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
               padding: const EdgeInsets.only(right: 10),
             )
           ],
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorSize: TabBarIndicatorSize.tab,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            padding: EdgeInsets.zero,
-            onTap: (value) {},
-            tabs: const <Widget>[
-              Tab(text: "All"),
-              Tab(text: "Category 1"),
-              Tab(text: "Category 2"),
-              Tab(text: "Category 3"),
-              Tab(text: "Category 4"),
-              Tab(text: "Category 5"),
-            ],
-          ),
         ),
-        body: TabBarView(
-          controller: _tabController,
+        body: Column(
           children: [
-            const IngredientsInCategory(),
-            SizedBox(),
-            SizedBox(),
-            SizedBox(),
-            SizedBox(),
-            SizedBox()
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: DropdownMenu<String>(
+                  initialSelection: dump.first,
+                  expandedInsets: EdgeInsets.zero,
+                  inputDecorationTheme: const InputDecorationTheme(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                  ),
+                  menuHeight: 300,
+                  dropdownMenuEntries: dump.map<DropdownMenuEntry<String>>((v) {
+                    return DropdownMenuEntry(value: v, label: v);
+                  }).toList()),
+            ),
+            const Expanded(child: IngredientsInCategory()),
           ],
         ),
       ),
