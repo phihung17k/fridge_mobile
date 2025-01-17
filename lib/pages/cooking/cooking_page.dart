@@ -42,7 +42,7 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: dump.length, vsync: this);
   }
 
   @override
@@ -50,41 +50,59 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
     return BlocProvider(
       bloc: bloc,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Choose Ingredient"),
-          // scrolledUnderElevation: 0,
-          // surfaceTintColor: Colors.transparent,
-          forceMaterialTransparency: true,
-          actions: [
-            IconButton(
-              onPressed: () => Navigator.pushNamed(context, Routes.selectingIngredient),
-              icon: BadgeCount(
-                count: 1,
-                child: const Icon(Icons.shopping_bag_outlined),
-              ),
-              padding: const EdgeInsets.only(right: 10),
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: DropdownMenu<String>(
-                  initialSelection: dump.first,
-                  expandedInsets: EdgeInsets.zero,
-                  inputDecorationTheme: const InputDecorationTheme(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+          appBar: AppBar(
+            title: const Text("Choose Ingredient"),
+            // scrolledUnderElevation: 0,
+            // surfaceTintColor: Colors.transparent,
+            forceMaterialTransparency: true,
+            actions: [
+              IconButton(
+                onPressed: () => Navigator.pushNamed(context, Routes.selectingIngredient),
+                icon: BadgeCount(
+                  count: 1,
+                  child: const Icon(Icons.shopping_bag_outlined),
+                ),
+                padding: const EdgeInsets.only(right: 10),
+              )
+            ],
+          ),
+          body: Column(
+            children: [
+              SizedBox(
+                height: 130,
+                // margin: const EdgeInsets.only(bottom: 10),
+                child: GridView.builder(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemCount: dump.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    mainAxisExtent: 100,
                   ),
-                  menuHeight: 300,
-                  dropdownMenuEntries: dump.map<DropdownMenuEntry<String>>((v) {
-                    return DropdownMenuEntry(value: v, label: v);
-                  }).toList()),
-            ),
-            const Expanded(child: IngredientsInCategory()),
-          ],
-        ),
-      ),
+                  itemBuilder: (context, index) {
+                    return ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          )),
+                      child: Text(dump[index]),
+                    );
+                  },
+                ),
+              ),
+              const Divider(
+                thickness: 1,
+                height: 1,
+              ),
+              const Expanded(child: IngredientsInCategory()),
+            ],
+          )),
     );
   }
 

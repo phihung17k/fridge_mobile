@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Fridge",
       debugShowCheckedModeBanner: false,
-      initialRoute: Routes.main,
+      initialRoute: Routes.cooking,
       onGenerateRoute: (settings) => Routes.getRoutes(settings),
       theme: brightness == Brightness.light ? theme.light() : theme.dark(),
       // navigatorObservers: [],

@@ -59,7 +59,6 @@ class CookingBloc extends BaseBloc<CookingState> {
     List<SelectableIngredientModel> items = state.ingredients!.toList();
     SelectableIngredientModel ingredient = items[index];
     items[index] = ingredient.copyWith(isSelected: !ingredient.isSelected);
-    log("selectIngredient ${items[index].isSelected}");
     emit(state.copyWith(ingredients: items));
   }
 }
