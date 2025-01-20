@@ -4,8 +4,9 @@ class ApiPath {
   static String get uri => "http://192.168.1.115:5091";
 
   static String get ingredients => "/api/Ingredient/list";
+  static String get categories => "/api/Category/all";
 
-  static String getUrl(String path) => "$uri$path";
+  // static String getUrl(String path) => "$uri$path";
 
   static Uri getUri({
     String? scheme = "http",

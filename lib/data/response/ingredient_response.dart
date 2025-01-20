@@ -1,13 +1,13 @@
 class IngredientResponse {
   final String id;
-  final String? name;
+  final String name;
   final String? localName;
   final String? description;
   final String? imageUrl;
 
-  IngredientResponse({
+  const IngredientResponse({
     required this.id,
-    this.name,
+    required this.name,
     this.localName,
     this.description,
     this.imageUrl,
