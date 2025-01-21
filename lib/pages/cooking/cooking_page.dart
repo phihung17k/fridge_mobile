@@ -97,7 +97,13 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
                         itemBuilder: (context, index) {
                           // index = 0 => category = All
                           return ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              if (index == 0) {
+                                bloc.getIngredients(pageIndex: 1);
+                              } else {
+                                bloc.getIngredientsByCategoryId(snapshot.data![index - 1].id!);
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.zero,
                                 shape: RoundedRectangleBorder(

@@ -73,4 +73,30 @@ class CookingBloc extends BaseBloc<CookingState> {
     List<CategoryModel>? categories = await categoryService.getAllCategory();
     emit(state.copyWith(categories: categories ?? []));
   }
+
+  void getIngredientsByCategoryId(int categoryId, {int? pageIndex}) async {
+    // if (state.hasNext == false) {
+    //   return;
+    // }
+    // // log("LOAD MORE - current page index: ${state.pageIndex}");
+    // emit(state.copyWith(
+    //   isLoadMore: true,
+    // ));
+
+    PagingResult<SelectableIngredientModel>? ingredientsPageResult =
+        await ingredientService.getSelectableIngredientsByCategoryId(
+      categoryId: categoryId,
+    );
+
+    if (ingredientsPageResult == null) {
+      return;
+    }
+
+    emit(state.copyWith(
+      ingredients: ingredientsPageResult.items,
+      hasNext: ingredientsPageResult.hasNext,
+      pageIndex: ingredientsPageResult.pageIndex,
+      isLoadMore: false,
+    ));
+  }
 }

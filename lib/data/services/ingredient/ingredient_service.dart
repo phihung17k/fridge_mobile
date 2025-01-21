@@ -63,6 +63,34 @@ class IngredientService implements IIngredientService {
     );
   }
 
+  @override
+  Future<PagingResult<SelectableIngredientModel>?> getSelectableIngredientsByCategoryId(
+      {int categoryId = 0, int? pageIndex}) async {
+    PagingResult<IngredientResponse>? response =
+        await repository.getIngredientsByCategoryId(categoryId, pageIndex ?? 1);
+    if (response == null) {
+      return null;
+    }
+
+    return PagingResult<SelectableIngredientModel>(
+      totalItemsCount: response.totalItemsCount,
+      pageCount: response.pageCount,
+      pageSize: response.pageSize,
+      pageIndex: response.pageIndex,
+      hasNext: response.hasNext,
+      hasPrevious: response.hasPrevious,
+      items: response.items
+          .map((item) => SelectableIngredientModel(
+                id: item.id,
+                name: item.name,
+                localName: item.localName,
+                description: item.description,
+                imageUrl: item.imageUrl,
+              ))
+          .toList(),
+    );
+  }
+
   // @override
   // Future<Ingredient> getIngredientById(String id) async {
   //   // Implement your logic to fetch a single ingredient by id here

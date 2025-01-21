@@ -36,4 +36,31 @@ class IngredientRepository implements IIngredientRepository {
       return Future.error(e);
     }
   }
+
+  @override
+  Future<PagingResult<IngredientResponse>?> getIngredientsByCategoryId(
+      int categoryId, int pageIndex) async {
+    try {
+      Map<String, dynamic> queryParameters = {
+        "categoryId": "$categoryId",
+        "pageIndex": "$pageIndex",
+        "pageSize": "10",
+      };
+      Uri uri = ApiPath.getUri(path: ApiPath.ingredients, queryParameters: queryParameters);
+      final Response response = await _client.getAsync(uri);
+      if (response.statusCode != 200) {
+        return null;
+      }
+
+      Map<String, dynamic>? body = _client.parseToMap(response);
+      if (body == null) {
+        return null;
+      }
+
+      return PagingResult.fromJson(body, IngredientResponse.fromJson);
+    } catch (e) {
+      log(e.toString());
+      return Future.error(e);
+    }
+  }
 }

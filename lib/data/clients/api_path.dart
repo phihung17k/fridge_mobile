@@ -3,7 +3,7 @@ class ApiPath {
   // static String get uri => "http://192.168.100.12:5091";
   static String get uri => "http://192.168.1.115:5091";
 
-  static String get ingredients => "/api/Ingredient/list";
+  static String get ingredients => "/api/Ingredient";
   static String get categories => "/api/Category/all";
 
   // static String getUrl(String path) => "$uri$path";
