@@ -41,7 +41,7 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
     return StreamBuilder<(List<SelectableIngredientModel>, bool)>(
       stream: bloc?.ingredientsAndLoadmoreStream,
       builder: (context, snapshot) {
-        log("StreamBuilder<(List<IngredientModel>, bool)> ${snapshot.data}");
+        // log("StreamBuilder<(List<IngredientModel>, bool)> ${snapshot.data}");
         if (!snapshot.hasData || snapshot.data!.$1.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }

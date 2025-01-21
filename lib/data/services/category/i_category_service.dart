@@ -1,3 +1,5 @@
+import 'package:fridge_mobile/data/models/category_model.dart';
+
 abstract class ICategoryService {
-  // Future<List<>>
+  Future<List<CategoryModel>?> getAllCategory();
 }

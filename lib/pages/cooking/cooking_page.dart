@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:fridge_mobile/blocs/bloc_provider.dart';
 import 'package:fridge_mobile/blocs/cooking/cooking_bloc.dart';
 import 'package:fridge_mobile/pages/base_state.dart';
 import 'package:fridge_mobile/pages/cooking/ingredients_in_category.dart';
 import 'package:fridge_mobile/routes.dart';
+import '../../data/models/category_model.dart';
 import 'badge_count.dart';
 
 class CookingPage extends StatefulWidget {
@@ -43,6 +46,7 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
   void initState() {
     super.initState();
     _tabController = TabController(length: dump.length, vsync: this);
+    bloc.getAllCategory();
   }
 
   @override
@@ -72,29 +76,41 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
               SizedBox(
                 height: 130,
                 // margin: const EdgeInsets.only(bottom: 10),
-                child: GridView.builder(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: dump.length,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    mainAxisExtent: 100,
-                  ),
-                  itemBuilder: (context, index) {
-                    return ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          )),
-                      child: Text(dump[index]),
-                    );
-                  },
-                ),
+                child: StreamBuilder<List<CategoryModel>>(
+                    stream: bloc.categoriesStream,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      log("snapshot.data!.length ${snapshot.data!.length}");
+                      return GridView.builder(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.length + 1,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          mainAxisExtent: 100,
+                        ),
+                        itemBuilder: (context, index) {
+                          // index = 0 => category = All
+                          return ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                )),
+                            child: Text(
+                              index == 0 ? "All" : snapshot.data![index - 1].localName!,
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        },
+                      );
+                    }),
               ),
               const Divider(
                 thickness: 1,

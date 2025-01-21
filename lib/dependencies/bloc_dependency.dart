@@ -7,6 +7,6 @@ class BlocDependencies {
     injector.registerFactory(() => MainBloc());
     injector.registerFactory(() => HomeBloc());
     injector.registerFactory(() => RecipeFormBloc());
-    injector.registerFactory(() => CookingBloc(injector()));
+    injector.registerFactory(() => CookingBloc(injector(), injector()));
   }
 }
