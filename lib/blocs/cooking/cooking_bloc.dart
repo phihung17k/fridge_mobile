@@ -18,6 +18,7 @@ class CookingBloc extends BaseBloc<CookingState> {
           pageIndex: 1,
           isLoadMore: false,
           categories: [],
+          selectedCategoryId: 0, // All
         ));
 
   Stream<List<SelectableIngredientModel>> get ingredientListStream =>
@@ -38,6 +39,7 @@ class CookingBloc extends BaseBloc<CookingState> {
     // log("LOAD MORE - current page index: ${state.pageIndex}");
     emit(state.copyWith(
       isLoadMore: true,
+      selectedCategoryId: 0,
     ));
 
     PagingResult<SelectableIngredientModel>? ingredientsPageResult = await Future.delayed(
@@ -74,23 +76,55 @@ class CookingBloc extends BaseBloc<CookingState> {
     emit(state.copyWith(categories: categories ?? []));
   }
 
-  void getIngredientsByCategoryId(int categoryId, {int? pageIndex}) async {
-    // if (state.hasNext == false) {
-    //   return;
-    // }
-    // // log("LOAD MORE - current page index: ${state.pageIndex}");
-    // emit(state.copyWith(
-    //   isLoadMore: true,
-    // ));
-
+  void getIngredientsByCategoryId(int categoryId) async {
     PagingResult<SelectableIngredientModel>? ingredientsPageResult =
         await ingredientService.getSelectableIngredientsByCategoryId(
       categoryId: categoryId,
     );
 
     if (ingredientsPageResult == null) {
+      emit(state.copyWith(
+        ingredients: [],
+        hasNext: false,
+        pageIndex: 1,
+        selectedCategoryId: categoryId,
+      ));
       return;
     }
+
+    emit(state.copyWith(
+      ingredients: ingredientsPageResult.items,
+      hasNext: ingredientsPageResult.hasNext,
+      pageIndex: ingredientsPageResult.pageIndex,
+      selectedCategoryId: categoryId,
+      isLoadMore: false,
+    ));
+  }
+
+  void loadMoreIngredientsByCategoryId() async {
+    if (state.hasNext == false) {
+      return;
+    }
+    // log("LOAD MORE - current page index: ${state.pageIndex}");
+    emit(state.copyWith(
+      isLoadMore: true,
+    ));
+
+    PagingResult<SelectableIngredientModel>? ingredientsPageResult =
+        await ingredientService.getSelectableIngredientsByCategoryId(
+      categoryId: state.selectedCategoryId!,
+      pageIndex: state.pageIndex! + 1,
+    );
+
+    if (ingredientsPageResult == null) {
+      emit(state.copyWith(
+        isLoadMore: false,
+      ));
+      return;
+    }
+
+    List<SelectableIngredientModel> items = state.ingredients!.toList();
+    items.addAll(ingredientsPageResult.items);
 
     emit(state.copyWith(
       ingredients: ingredientsPageResult.items,

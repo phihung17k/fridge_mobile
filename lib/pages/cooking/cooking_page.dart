@@ -82,7 +82,7 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
                       if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      log("snapshot.data!.length ${snapshot.data!.length}");
+                      // log("snapshot.data!.length ${snapshot.data!.length}");
                       return GridView.builder(
                         scrollDirection: Axis.horizontal,
                         shrinkWrap: true,
@@ -96,6 +96,13 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
                         ),
                         itemBuilder: (context, index) {
                           // index = 0 => category = All
+
+                          Color backgroundColor = Theme.of(context).colorScheme.inversePrimary;
+                          if (index == 0 && bloc.state.selectedCategoryId == null) {
+                            backgroundColor = Theme.of(context).colorScheme.primary;
+                          }
+                          // else if (bloc.state.selectedCategoryId ==
+                          //     snapshot.data![index - 1].id) {}
                           return ElevatedButton(
                             onPressed: () {
                               if (index == 0) {
@@ -105,10 +112,12 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                )),
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              backgroundColor: backgroundColor,
+                            ),
                             child: Text(
                               index == 0 ? "All" : snapshot.data![index - 1].localName!,
                               textAlign: TextAlign.center,

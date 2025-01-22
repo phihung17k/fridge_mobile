@@ -23,7 +23,9 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >= scrollController.position.maxScrollExtent) {
-          bloc?.getIngredients();
+          bloc!.state.selectedCategoryId == null
+              ? bloc?.getIngredients()
+              : bloc?.loadMoreIngredientsByCategoryId();
         }
       },
     );
