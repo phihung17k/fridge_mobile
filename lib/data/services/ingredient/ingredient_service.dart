@@ -1,4 +1,5 @@
 import 'package:fridge_mobile/data/repositories/ingredient/i_ingredient_repository.dart';
+import 'package:fridge_mobile/data/request/ingredient_paging_request.dart';
 import 'package:fridge_mobile/data/response/ingredient_response.dart';
 import 'package:fridge_mobile/data/services/ingredient/i_ingredient_service.dart';
 import 'package:fridge_mobile/data/models/ingredient_model.dart';
@@ -11,63 +12,36 @@ class IngredientService implements IIngredientService {
 
   IngredientService(this.repository);
 
-  @override
-  Future<PagingResult<IngredientModel>?> getIngredients(int? pageIndex) async {
-    PagingResult<IngredientResponse>? response = await repository.getIngredients(pageIndex ?? 1);
-    if (response == null) {
-      return null;
-    }
+  // @override
+  // Future<PagingResult<IngredientModel>?> getIngredients(int? pageIndex) async {
+  //   PagingResult<IngredientResponse>? response = await repository.getIngredients(pageIndex ?? 1);
+  //   if (response == null) {
+  //     return null;
+  //   }
 
-    return PagingResult<IngredientModel>(
-      totalItemsCount: response.totalItemsCount,
-      pageCount: response.pageCount,
-      pageSize: response.pageSize,
-      pageIndex: response.pageIndex,
-      hasNext: response.hasNext,
-      hasPrevious: response.hasPrevious,
-      items: response.items
-          .map((item) => IngredientModel(
-                id: item.id,
-                name: item.name,
-                localName: item.localName,
-                description: item.description,
-                imageUrl: item.imageUrl,
-              ))
-          .toList(),
-    );
-  }
-
-  @override
-  Future<PagingResult<SelectableIngredientModel>?> getSelectableIngredients(int? pageIndex) async {
-    PagingResult<IngredientResponse>? response = await repository.getIngredients(pageIndex ?? 1);
-    if (response == null) {
-      return null;
-    }
-
-    return PagingResult<SelectableIngredientModel>(
-      totalItemsCount: response.totalItemsCount,
-      pageCount: response.pageCount,
-      pageSize: response.pageSize,
-      pageIndex: response.pageIndex,
-      hasNext: response.hasNext,
-      hasPrevious: response.hasPrevious,
-      items: response.items
-          .map((item) => SelectableIngredientModel(
-                id: item.id,
-                name: item.name,
-                localName: item.localName,
-                description: item.description,
-                imageUrl: item.imageUrl,
-              ))
-          .toList(),
-    );
-  }
+  //   return PagingResult<IngredientModel>(
+  //     totalItemsCount: response.totalItemsCount,
+  //     pageCount: response.pageCount,
+  //     pageSize: response.pageSize,
+  //     pageIndex: response.pageIndex,
+  //     hasNext: response.hasNext,
+  //     hasPrevious: response.hasPrevious,
+  //     items: response.items
+  //         .map((item) => IngredientModel(
+  //               id: item.id,
+  //               name: item.name,
+  //               localName: item.localName,
+  //               description: item.description,
+  //               imageUrl: item.imageUrl,
+  //             ))
+  //         .toList(),
+  //   );
+  // }
 
   @override
-  Future<PagingResult<SelectableIngredientModel>?> getSelectableIngredientsByCategoryId(
-      {int categoryId = 0, int? pageIndex}) async {
-    PagingResult<IngredientResponse>? response =
-        await repository.getIngredientsByCategoryId(categoryId, pageIndex ?? 1);
+  Future<PagingResult<SelectableIngredientModel>?> getSelectableIngredients(
+      IngredientPagingRequest request) async {
+    PagingResult<IngredientResponse>? response = await repository.getIngredients(request);
     if (response == null) {
       return null;
     }
@@ -90,6 +64,34 @@ class IngredientService implements IIngredientService {
           .toList(),
     );
   }
+
+  // @override
+  // Future<PagingResult<SelectableIngredientModel>?> getSelectableIngredientsByCategoryId(
+  //     {int categoryId = 0, int? pageIndex}) async {
+  //   PagingResult<IngredientResponse>? response =
+  //       await repository.getIngredientsByCategoryId(categoryId, pageIndex ?? 1);
+  //   if (response == null) {
+  //     return null;
+  //   }
+
+  //   return PagingResult<SelectableIngredientModel>(
+  //     totalItemsCount: response.totalItemsCount,
+  //     pageCount: response.pageCount,
+  //     pageSize: response.pageSize,
+  //     pageIndex: response.pageIndex,
+  //     hasNext: response.hasNext,
+  //     hasPrevious: response.hasPrevious,
+  //     items: response.items
+  //         .map((item) => SelectableIngredientModel(
+  //               id: item.id,
+  //               name: item.name,
+  //               localName: item.localName,
+  //               description: item.description,
+  //               imageUrl: item.imageUrl,
+  //             ))
+  //         .toList(),
+  //   );
+  // }
 
   // @override
   // Future<Ingredient> getIngredientById(String id) async {

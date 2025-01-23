@@ -6,47 +6,47 @@ import '../../data/models/category_model.dart';
 class CookingState extends Equatable {
   // selectCategoryId = 0 => All
 
+  final List<CategoryModel>? categories;
   final List<SelectableIngredientModel>? ingredients;
+  final int? selectedCategoryId;
   final bool? hasNext;
   final int? pageIndex;
   final bool? isLoadMore;
-  final List<CategoryModel>? categories;
-  final int? selectedCategoryId;
 
   const CookingState({
+    this.categories,
     this.ingredients,
+    this.selectedCategoryId,
     this.hasNext,
     this.pageIndex,
     this.isLoadMore,
-    this.categories,
-    this.selectedCategoryId,
   });
 
   CookingState copyWith({
+    List<CategoryModel>? categories,
     List<SelectableIngredientModel>? ingredients,
+    int? selectedCategoryId,
     bool? hasNext,
     int? pageIndex,
     bool? isLoadMore,
-    List<CategoryModel>? categories,
-    int? selectedCategoryId,
   }) {
     return CookingState(
+      categories: categories ?? this.categories,
+      selectedCategoryId: selectedCategoryId ?? this.selectedCategoryId,
       ingredients: ingredients ?? this.ingredients,
       hasNext: hasNext ?? this.hasNext,
       pageIndex: pageIndex ?? this.pageIndex,
       isLoadMore: isLoadMore ?? this.isLoadMore,
-      categories: categories ?? this.categories,
-      selectedCategoryId: selectedCategoryId ?? this.selectedCategoryId,
     );
   }
 
   @override
   List<Object?> get props => [
+        categories,
         ingredients,
+        selectedCategoryId,
         hasNext,
         pageIndex,
         isLoadMore,
-        categories,
-        selectedCategoryId,
       ];
 }

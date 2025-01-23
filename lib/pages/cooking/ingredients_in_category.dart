@@ -23,9 +23,10 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
     scrollController.addListener(
       () {
         if (scrollController.position.pixels >= scrollController.position.maxScrollExtent) {
-          bloc!.state.selectedCategoryId == null
-              ? bloc?.getIngredients()
-              : bloc?.loadMoreIngredientsByCategoryId();
+          // bloc!.state.selectedCategoryId == null
+          //     ? bloc?.getIngredients()
+          //     : bloc?.loadMoreIngredientsByCategoryId();
+          bloc?.loadMoreIngredients();
         }
       },
     );
@@ -35,7 +36,7 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     bloc = BlocProvider.maybeOf<CookingBloc>(context)!;
-    bloc?.getIngredients(pageIndex: 1);
+    // bloc?.getIngredients(pageIndex: 1);
   }
 
   @override

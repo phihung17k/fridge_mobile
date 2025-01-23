@@ -47,6 +47,7 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
     super.initState();
     _tabController = TabController(length: dump.length, vsync: this);
     bloc.getAllCategory();
+    bloc.getIngredientsAtFirstTime();
   }
 
   @override
@@ -95,21 +96,20 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
                           mainAxisExtent: 100,
                         ),
                         itemBuilder: (context, index) {
-                          // index = 0 => category = All
-
                           Color backgroundColor = Theme.of(context).colorScheme.inversePrimary;
                           if (index == 0 && bloc.state.selectedCategoryId == null) {
-                            backgroundColor = Theme.of(context).colorScheme.primary;
+                            backgroundColor = Theme.of(context).colorScheme.surface;
                           }
-                          // else if (bloc.state.selectedCategoryId ==
-                          //     snapshot.data![index - 1].id) {}
+
                           return ElevatedButton(
                             onPressed: () {
-                              if (index == 0) {
-                                bloc.getIngredients(pageIndex: 1);
-                              } else {
-                                bloc.getIngredientsByCategoryId(snapshot.data![index - 1].id!);
-                              }
+                              bloc.getIngredientsAtFirstTime(
+                                  categoryId: index == 0 ? null : snapshot.data![index - 1].id);
+                              // if (index == 0) {
+                              //   bloc.getIngredients(pageIndex: 1);
+                              // } else {
+                              //   bloc.getIngredientsByCategoryId(snapshot.data![index - 1].id!);
+                              // }
                             },
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.zero,

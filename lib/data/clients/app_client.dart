@@ -16,14 +16,14 @@ class AppClient {
   }
 
   void logResponse(Response response) {
-    // log("Response: ${response.toString()}");
+    log("--------------Response-----------");
     log("Status Code: ${response.statusCode}");
     log("Headers: ${response.headers}");
     log("Body: ${response.body}");
   }
 
   Future<Response> getAsync(Uri uri) async {
-    log("------------------start------------------");
+    log("------------------START------------------");
     log('GET Request: $uri');
     Response response = await get(
       uri,
@@ -40,7 +40,7 @@ class AppClient {
       },
     );
     logResponse(response);
-    log("-------------------end-------------------");
+    log("-------------------END-------------------");
     return response;
   }
 
