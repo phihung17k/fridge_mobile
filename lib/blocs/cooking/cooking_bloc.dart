@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:fridge_mobile/blocs/base_bloc.dart';
 import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
 import 'package:fridge_mobile/data/request/ingredient_paging_request.dart';
@@ -16,11 +15,13 @@ class CookingBloc extends BaseBloc<CookingState> {
   CookingBloc(this.ingredientService, this.categoryService)
       : super(const CookingState(
           categories: [],
+          categoryIngredientsMap: {},
           ingredients: [],
-          selectedCategoryId: null, // All
+          selectedCategoryId: 0, // All
           hasNext: false,
           pageIndex: 1,
           isLoadMore: false,
+          disableOtherButton: false,
         ));
 
   Stream<List<SelectableIngredientModel>> get ingredientListStream =>
@@ -34,6 +35,19 @@ class CookingBloc extends BaseBloc<CookingState> {
   Stream<List<CategoryModel>> get categoriesStream =>
       stateStream.map((state) => state.categories!).distinct();
 
+  Stream<int?> get selectedCategoryIdStream =>
+      stateStream.map((state) => state.selectedCategoryId).distinct();
+
+  Stream<bool> get disableOtherButtonStream =>
+      stateStream.map((state) => state.disableOtherButton!).distinct();
+
+  Stream<(List<CategoryModel>, int?, bool)>
+      get categoriesAndSelectedCategoryIdAndDisableOtherButtonStream => Rx.combineLatest3(
+          categoriesStream,
+          selectedCategoryIdStream,
+          disableOtherButtonStream,
+          (a, b, c) => (a, b, c)).distinct();
+
   /// get All category
   void getAllCategory() async {
     List<CategoryModel>? categories = await categoryService.getAllCategory();
@@ -41,22 +55,43 @@ class CookingBloc extends BaseBloc<CookingState> {
   }
 
   /// get ingredient at the first time trigger cooking page
-  void getIngredientsAtFirstTime({int? categoryId}) async {
-    PagingResult<SelectableIngredientModel>? ingredientsPageResult =
-        await Future.delayed(const Duration(seconds: 1), () {
-      // get ingredient by All category
-      return ingredientService
-          .getSelectableIngredients(IngredientPagingRequest(categoryId: categoryId));
-    });
+  void getIngredientsWithCategory({int? categoryId}) async {
+    categoryId ??= 0;
+    emit(state.copyWith(
+      ingredients: [],
+      hasNext: false,
+      pageIndex: 1,
+      selectedCategoryId: categoryId,
+      disableOtherButton: true,
+    ));
+
+    PagingResult<SelectableIngredientModel>? ingredientsPageResult;
+    // call api to get ingredient by category if it's not exist in map
+    if (state.categoryIngredientsMap!.isEmpty ||
+        !state.categoryIngredientsMap!.containsKey(categoryId)) {
+      ingredientsPageResult = await Future.delayed(const Duration(seconds: 1), () {
+        // get ingredient by All category
+        return ingredientService
+            .getSelectableIngredients(IngredientPagingRequest(categoryId: categoryId));
+      });
+    } else {}
 
     if (ingredientsPageResult == null) {
+      emit(state.copyWith(
+        disableOtherButton: false,
+      ));
       return;
     }
 
+    Map<int, List<SelectableIngredientModel>?>? newMap = Map.from(state.categoryIngredientsMap!);
+    newMap[categoryId] = ingredientsPageResult.items;
+
     emit(state.copyWith(
+      categoryIngredientsMap: newMap,
       ingredients: ingredientsPageResult.items,
       hasNext: ingredientsPageResult.hasNext,
       pageIndex: ingredientsPageResult.pageIndex,
+      disableOtherButton: false,
     ));
   }
 
@@ -101,62 +136,4 @@ class CookingBloc extends BaseBloc<CookingState> {
     items[index] = ingredient.copyWith(isSelected: !ingredient.isSelected);
     emit(state.copyWith(ingredients: items));
   }
-
-  // void getIngredientsByCategoryId(int categoryId) async {
-  //   PagingResult<SelectableIngredientModel>? ingredientsPageResult =
-  //       await ingredientService.getSelectableIngredientsByCategoryId(
-  //     categoryId: categoryId,
-  //   );
-
-  //   if (ingredientsPageResult == null) {
-  //     emit(state.copyWith(
-  //       ingredients: [],
-  //       hasNext: false,
-  //       pageIndex: 1,
-  //       selectedCategoryId: categoryId,
-  //     ));
-  //     return;
-  //   }
-
-  //   emit(state.copyWith(
-  //     ingredients: ingredientsPageResult.items,
-  //     hasNext: ingredientsPageResult.hasNext,
-  //     pageIndex: ingredientsPageResult.pageIndex,
-  //     selectedCategoryId: categoryId,
-  //     isLoadMore: false,
-  //   ));
-  // }
-
-  // void loadMoreIngredientsByCategoryId() async {
-  //   if (state.hasNext == false) {
-  //     return;
-  //   }
-  //   // log("LOAD MORE - current page index: ${state.pageIndex}");
-  //   emit(state.copyWith(
-  //     isLoadMore: true,
-  //   ));
-
-  //   PagingResult<SelectableIngredientModel>? ingredientsPageResult =
-  //       await ingredientService.getSelectableIngredientsByCategoryId(
-  //     categoryId: state.selectedCategoryId!,
-  //     pageIndex: state.pageIndex! + 1,
-  //   );
-
-  //   if (ingredientsPageResult == null) {
-  //     emit(state.copyWith(
-  //       isLoadMore: false,
-  //     ));
-  //     return;
-  //   }
-
-  //   List<SelectableIngredientModel> items = state.ingredients!.toList();
-  //   items.addAll(ingredientsPageResult.items);
-
-  //   emit(state.copyWith(
-  //     ingredients: ingredientsPageResult.items,
-  //     hasNext: ingredientsPageResult.hasNext,
-  //     pageIndex: ingredientsPageResult.pageIndex,
-  //     isLoadMore: false,
-  //   ));
-  // }
 }

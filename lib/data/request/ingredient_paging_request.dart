@@ -11,9 +11,11 @@ class PagingRequest {
 }
 
 class IngredientPagingRequest extends PagingRequest {
-  final int? categoryId;
+  int? categoryId;
 
-  IngredientPagingRequest({super.pageIndex, super.pageSize, this.categoryId});
+  IngredientPagingRequest({super.pageIndex, super.pageSize, this.categoryId}) {
+    categoryId = categoryId == 0 ? null : categoryId;
+  }
 
   @override
   Map<String, dynamic> toJson() {

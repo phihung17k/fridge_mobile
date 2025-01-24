@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:http/http.dart';
 
 class AppClient {
@@ -37,6 +38,15 @@ class AppClient {
         // "Access-Control-Allow-Headers":
         //     "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
         // "Access-Control-Allow-Methods": "POST, OPTIONS, GET, PUT, DELETE",
+      },
+    ).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        log("----------TIMEOUT---------");
+        return Response(
+          "Server Timeout",
+          HttpStatus.gatewayTimeout,
+        );
       },
     );
     logResponse(response);

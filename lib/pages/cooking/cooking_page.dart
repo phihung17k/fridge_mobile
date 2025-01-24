@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:fridge_mobile/blocs/bloc_provider.dart';
 import 'package:fridge_mobile/blocs/cooking/cooking_bloc.dart';
@@ -16,38 +14,12 @@ class CookingPage extends StatefulWidget {
   State<CookingPage> createState() => _CookingPageState();
 }
 
-class _CookingPageState extends BaseState<CookingPage, CookingBloc>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  final List<String> dump = [
-    "All",
-    "Category 1",
-    "Category 2",
-    "Category 3",
-    "Category 4",
-    "Category 5",
-    "Category 5",
-    "Category 6",
-    "Category 7",
-    "Category 8",
-    "Category 9",
-    "Category 10",
-    "Category 11",
-    "Category 12",
-    "Category 13",
-    "Category 14",
-    "Category 15",
-    "Category 16",
-    "Category 18"
-  ];
-
+class _CookingPageState extends BaseState<CookingPage, CookingBloc> {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: dump.length, vsync: this);
     bloc.getAllCategory();
-    bloc.getIngredientsAtFirstTime();
+    bloc.getIngredientsWithCategory();
   }
 
   @override
@@ -76,18 +48,20 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
             children: [
               SizedBox(
                 height: 130,
-                // margin: const EdgeInsets.only(bottom: 10),
-                child: StreamBuilder<List<CategoryModel>>(
-                    stream: bloc.categoriesStream,
+                child: StreamBuilder<(List<CategoryModel>, int?, bool)>(
+                    stream: bloc.categoriesAndSelectedCategoryIdAndDisableOtherButtonStream,
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      if (!snapshot.hasData || snapshot.data!.$1.isEmpty) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      // log("snapshot.data!.length ${snapshot.data!.length}");
+                      List<CategoryModel> categories = snapshot.data!.$1;
+                      int? selectedCategoryId = snapshot.data!.$2;
+                      bool disableButton = snapshot.data!.$3;
+
                       return GridView.builder(
                         scrollDirection: Axis.horizontal,
                         shrinkWrap: true,
-                        itemCount: snapshot.data!.length + 1,
+                        itemCount: categories.length + 1,
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
@@ -96,21 +70,18 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
                           mainAxisExtent: 100,
                         ),
                         itemBuilder: (context, index) {
-                          Color backgroundColor = Theme.of(context).colorScheme.inversePrimary;
-                          if (index == 0 && bloc.state.selectedCategoryId == null) {
-                            backgroundColor = Theme.of(context).colorScheme.surface;
-                          }
+                          CategoryModel? category = index > 0 ? categories[index - 1] : null;
+                          Color backgroundColor = Theme.of(context).colorScheme.surface;
 
+                          // set background color to the selected category
+                          // category = null => "All" button => categoryId = 0
+                          if (selectedCategoryId == (category?.id ?? 0)) {
+                            backgroundColor = Theme.of(context).colorScheme.inversePrimary;
+                          }
                           return ElevatedButton(
-                            onPressed: () {
-                              bloc.getIngredientsAtFirstTime(
-                                  categoryId: index == 0 ? null : snapshot.data![index - 1].id);
-                              // if (index == 0) {
-                              //   bloc.getIngredients(pageIndex: 1);
-                              // } else {
-                              //   bloc.getIngredientsByCategoryId(snapshot.data![index - 1].id!);
-                              // }
-                            },
+                            onPressed: disableButton && selectedCategoryId != (category?.id ?? 0)
+                                ? null
+                                : () => bloc.getIngredientsWithCategory(categoryId: category?.id),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.zero,
                               shape: RoundedRectangleBorder(
@@ -119,7 +90,7 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
                               backgroundColor: backgroundColor,
                             ),
                             child: Text(
-                              index == 0 ? "All" : snapshot.data![index - 1].localName!,
+                              category?.localName ?? "All",
                               textAlign: TextAlign.center,
                             ),
                           );
@@ -135,11 +106,5 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc>
             ],
           )),
     );
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 }
