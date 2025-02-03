@@ -1,3 +1,5 @@
+typedef JsonModelFactory<T> = T Function(Map<String, dynamic> json);
+
 class PagingResult<T> {
   final int totalItemsCount;
   final int pageCount;
@@ -17,10 +19,12 @@ class PagingResult<T> {
     required this.items,
   });
 
-  factory PagingResult.fromJson(Map<String, dynamic>? json, Function fromJsonModel) {
+  factory PagingResult.fromJson(Map<String, dynamic>? json, JsonModelFactory fromJsonModel) {
     if (json == null || json.isEmpty) throw Exception("Json paging model cannot null");
-    final itemsMap = json['items'].cast<Map<String, dynamic>>();
-    List<T> items = List<T>.from(itemsMap.map((itemsJson) => fromJsonModel(itemsJson)));
+    // final itemsMap = json['items'].cast<Map<String, dynamic>>();
+    final rawItems = json['items'] as List<dynamic>;
+    List<T> items =
+        List<T>.from(rawItems.map((item) => fromJsonModel(item as Map<String, dynamic>)));
     return PagingResult(
         totalItemsCount: json['totalItemsCount'],
         pageCount: json['pageCount'],

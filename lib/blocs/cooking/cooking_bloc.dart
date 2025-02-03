@@ -56,6 +56,7 @@ class CookingBloc extends BaseBloc<CookingState> {
 
   /// get ingredient at the first time trigger cooking page
   void getIngredientsWithCategory({int? categoryId}) async {
+    // case categoryId is not inputted, call ingredient for all categories
     categoryId ??= 0;
     emit(state.copyWith(
       ingredients: [],
@@ -66,33 +67,53 @@ class CookingBloc extends BaseBloc<CookingState> {
     ));
 
     PagingResult<SelectableIngredientModel>? ingredientsPageResult;
-    // call api to get ingredient by category if it's not exist in map
-    if (state.categoryIngredientsMap!.isEmpty ||
-        !state.categoryIngredientsMap!.containsKey(categoryId)) {
+    // case category is NOT exist in map OR category id != 0
+    bool isNotExistedCategory =
+        categoryId != 0 && !state.categoryIngredientsMap!.containsKey(categoryId);
+    if (state.categoryIngredientsMap!.isEmpty || isNotExistedCategory) {
+      // call API
       ingredientsPageResult = await Future.delayed(const Duration(seconds: 1), () {
-        // get ingredient by All category
         return ingredientService
             .getSelectableIngredients(IngredientPagingRequest(categoryId: categoryId));
       });
-    } else {}
 
-    if (ingredientsPageResult == null) {
+      if (ingredientsPageResult == null) {
+        emit(state.copyWith(
+          disableOtherButton: false,
+        ));
+        return;
+      }
+
+      // add ingredients by category id in map <id, ingredients>
+      Map<int, List<SelectableIngredientModel>?>? newMap = Map.from(state.categoryIngredientsMap!);
+      for (SelectableIngredientModel ingredient in ingredientsPageResult.items) {
+        newMap.putIfAbsent(ingredient.category!.id!, () => [])!.add(ingredient);
+      }
+
       emit(state.copyWith(
+        categoryIngredientsMap: newMap,
+        ingredients: ingredientsPageResult.items,
+        hasNext: ingredientsPageResult.hasNext,
+        pageIndex: ingredientsPageResult.pageIndex,
         disableOtherButton: false,
       ));
-      return;
+    } else {
+      // get the first 10 items by category
+      // case category id = 0, get the first 10 items by category id = 1
+      List<SelectableIngredientModel> ingredients = categoryId == 0
+          ? state.categoryIngredientsMap!.values
+              .expand<SelectableIngredientModel>((element) => element!.toList())
+              .take(10)
+              .toList()
+          : state.categoryIngredientsMap![categoryId]!.take(10).toList();
+
+      emit(state.copyWith(
+        ingredients: ingredients,
+        hasNext: true,
+        pageIndex: 1,
+        disableOtherButton: false,
+      ));
     }
-
-    Map<int, List<SelectableIngredientModel>?>? newMap = Map.from(state.categoryIngredientsMap!);
-    newMap[categoryId] = ingredientsPageResult.items;
-
-    emit(state.copyWith(
-      categoryIngredientsMap: newMap,
-      ingredients: ingredientsPageResult.items,
-      hasNext: ingredientsPageResult.hasNext,
-      pageIndex: ingredientsPageResult.pageIndex,
-      disableOtherButton: false,
-    ));
   }
 
   /// get ingredient with page index

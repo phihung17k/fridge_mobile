@@ -1,3 +1,4 @@
+import 'package:fridge_mobile/data/models/category_model.dart';
 import 'package:fridge_mobile/data/repositories/ingredient/i_ingredient_repository.dart';
 import 'package:fridge_mobile/data/request/ingredient_paging_request.dart';
 import 'package:fridge_mobile/data/response/ingredient_response.dart';
@@ -60,6 +61,12 @@ class IngredientService implements IIngredientService {
                 localName: item.localName,
                 description: item.description,
                 imageUrl: item.imageUrl,
+                category: CategoryModel(
+                  id: item.category.id,
+                  name: item.category.name,
+                  localName: item.category.localName,
+                  description: item.category.description,
+                ),
               ))
           .toList(),
     );

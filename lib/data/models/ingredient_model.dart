@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:fridge_mobile/data/models/category_model.dart';
 
 class IngredientModel extends Equatable {
   final String? id;
@@ -6,6 +7,7 @@ class IngredientModel extends Equatable {
   final String? localName;
   final String? description;
   final String? imageUrl;
+  final CategoryModel? category;
 
   const IngredientModel({
     this.id,
@@ -13,6 +15,7 @@ class IngredientModel extends Equatable {
     this.localName,
     this.description,
     this.imageUrl,
+    this.category,
   });
 
   IngredientModel copyWith({
@@ -21,6 +24,7 @@ class IngredientModel extends Equatable {
     String? localName,
     String? description,
     String? imageUrl,
+    CategoryModel? category,
   }) {
     return IngredientModel(
       id: id ?? this.id,
@@ -28,6 +32,7 @@ class IngredientModel extends Equatable {
       localName: localName ?? this.localName,
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
+      category: category ?? this.category,
     );
   }
 

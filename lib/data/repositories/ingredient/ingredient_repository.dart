@@ -30,7 +30,7 @@ class IngredientRepository implements IIngredientRepository {
         return null;
       }
 
-      return PagingResult.fromJson(body, IngredientResponse.fromJson);
+      return PagingResult.fromJson(body, (json) => IngredientResponse.fromJson(json));
     } catch (e) {
       log(e.toString());
       return Future.error(e);
