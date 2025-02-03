@@ -49,14 +49,14 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc> {
               SizedBox(
                 height: 130,
                 child: StreamBuilder<(List<CategoryModel>, int?, bool)>(
-                    stream: bloc.categoriesAndSelectedCategoryIdAndDisableOtherButtonStream,
+                    stream: bloc.categories_selectedCategoryId_waitGettingIngredientsStream,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData || snapshot.data!.$1.isEmpty) {
                         return const Center(child: CircularProgressIndicator());
                       }
                       List<CategoryModel> categories = snapshot.data!.$1;
                       int? selectedCategoryId = snapshot.data!.$2;
-                      bool disableButton = snapshot.data!.$3;
+                      bool waitGettingIngredient = snapshot.data!.$3;
 
                       return GridView.builder(
                         scrollDirection: Axis.horizontal,
@@ -79,7 +79,8 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc> {
                             backgroundColor = Theme.of(context).colorScheme.inversePrimary;
                           }
                           return ElevatedButton(
-                            onPressed: disableButton && selectedCategoryId != (category?.id ?? 0)
+                            onPressed: waitGettingIngredient &&
+                                    selectedCategoryId != (category?.id ?? 0)
                                 ? null
                                 : () => bloc.getIngredientsWithCategory(categoryId: category?.id),
                             style: ElevatedButton.styleFrom(
@@ -88,6 +89,7 @@ class _CookingPageState extends BaseState<CookingPage, CookingBloc> {
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               backgroundColor: backgroundColor,
+                              disabledBackgroundColor: backgroundColor,
                             ),
                             child: Text(
                               category?.localName ?? "All",

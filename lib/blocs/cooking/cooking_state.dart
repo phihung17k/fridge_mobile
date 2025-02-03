@@ -13,7 +13,7 @@ class CookingState extends Equatable {
   final bool? hasNext;
   final int? pageIndex;
   final bool? isLoadMore;
-  final bool? disableOtherButton;
+  final bool? waitGettingIngredients;
 
   const CookingState({
     this.categories,
@@ -23,8 +23,18 @@ class CookingState extends Equatable {
     this.hasNext,
     this.pageIndex,
     this.isLoadMore,
-    this.disableOtherButton,
+    this.waitGettingIngredients,
   });
+
+  CookingState.empty()
+      : categories = [],
+        categoryIngredientsMap = {},
+        ingredients = [],
+        selectedCategoryId = 0, // All
+        hasNext = false,
+        pageIndex = 1,
+        isLoadMore = false,
+        waitGettingIngredients = false;
 
   CookingState copyWith({
     List<CategoryModel>? categories,
@@ -34,7 +44,7 @@ class CookingState extends Equatable {
     bool? hasNext,
     int? pageIndex,
     bool? isLoadMore,
-    bool? disableOtherButton,
+    bool? waitGettingIngredients,
   }) {
     return CookingState(
       categories: categories ?? this.categories,
@@ -44,7 +54,7 @@ class CookingState extends Equatable {
       hasNext: hasNext ?? this.hasNext,
       pageIndex: pageIndex ?? this.pageIndex,
       isLoadMore: isLoadMore ?? this.isLoadMore,
-      disableOtherButton: disableOtherButton ?? this.disableOtherButton,
+      waitGettingIngredients: waitGettingIngredients ?? this.waitGettingIngredients,
     );
   }
 
@@ -57,6 +67,6 @@ class CookingState extends Equatable {
         hasNext,
         pageIndex,
         isLoadMore,
-        disableOtherButton,
+        waitGettingIngredients,
       ];
 }

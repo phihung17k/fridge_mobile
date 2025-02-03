@@ -1,8 +1,13 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'dart:developer';
+
 import 'package:fridge_mobile/blocs/base_bloc.dart';
 import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
 import 'package:fridge_mobile/data/request/ingredient_paging_request.dart';
 import 'package:fridge_mobile/data/services/category/i_category_service.dart';
 import 'package:fridge_mobile/data/services/ingredient/i_ingredient_service.dart';
+import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import '../../data/models/category_model.dart';
 import '../../data/paging_result.dart';
@@ -12,25 +17,21 @@ class CookingBloc extends BaseBloc<CookingState> {
   final IIngredientService ingredientService;
   final ICategoryService categoryService;
 
-  CookingBloc(this.ingredientService, this.categoryService)
-      : super(const CookingState(
-          categories: [],
-          categoryIngredientsMap: {},
-          ingredients: [],
-          selectedCategoryId: 0, // All
-          hasNext: false,
-          pageIndex: 1,
-          isLoadMore: false,
-          disableOtherButton: false,
-        ));
+  CookingBloc(this.ingredientService, this.categoryService) : super(CookingState.empty());
 
   Stream<List<SelectableIngredientModel>> get ingredientListStream =>
       stateStream.map((state) => state.ingredients!).distinct();
 
   Stream<bool> get isLoadMoreStream => stateStream.map((state) => state.isLoadMore!).distinct();
+  Stream<bool> get waitGettingIngredientsStream =>
+      stateStream.map((state) => state.waitGettingIngredients!).distinct();
 
-  Stream<(List<SelectableIngredientModel>, bool)> get ingredientsAndLoadmoreStream =>
-      Rx.combineLatest2(ingredientListStream, isLoadMoreStream, (a, b) => (a, b)).distinct();
+  Stream<(List<SelectableIngredientModel>, bool, bool)>
+      get ingredients_waitGettingIngredients_loadmoreStream => Rx.combineLatest3(
+          ingredientListStream,
+          waitGettingIngredientsStream,
+          isLoadMoreStream,
+          (a, b, c) => (a, b, c)).distinct();
 
   Stream<List<CategoryModel>> get categoriesStream =>
       stateStream.map((state) => state.categories!).distinct();
@@ -38,14 +39,11 @@ class CookingBloc extends BaseBloc<CookingState> {
   Stream<int?> get selectedCategoryIdStream =>
       stateStream.map((state) => state.selectedCategoryId).distinct();
 
-  Stream<bool> get disableOtherButtonStream =>
-      stateStream.map((state) => state.disableOtherButton!).distinct();
-
   Stream<(List<CategoryModel>, int?, bool)>
-      get categoriesAndSelectedCategoryIdAndDisableOtherButtonStream => Rx.combineLatest3(
+      get categories_selectedCategoryId_waitGettingIngredientsStream => Rx.combineLatest3(
           categoriesStream,
           selectedCategoryIdStream,
-          disableOtherButtonStream,
+          waitGettingIngredientsStream,
           (a, b, c) => (a, b, c)).distinct();
 
   /// get All category
@@ -63,7 +61,7 @@ class CookingBloc extends BaseBloc<CookingState> {
       hasNext: false,
       pageIndex: 1,
       selectedCategoryId: categoryId,
-      disableOtherButton: true,
+      waitGettingIngredients: true,
     ));
 
     PagingResult<SelectableIngredientModel>? ingredientsPageResult;
@@ -78,8 +76,9 @@ class CookingBloc extends BaseBloc<CookingState> {
       });
 
       if (ingredientsPageResult == null) {
+        log("ingredientsPageResult == null");
         emit(state.copyWith(
-          disableOtherButton: false,
+          waitGettingIngredients: false,
         ));
         return;
       }
@@ -95,7 +94,7 @@ class CookingBloc extends BaseBloc<CookingState> {
         ingredients: ingredientsPageResult.items,
         hasNext: ingredientsPageResult.hasNext,
         pageIndex: ingredientsPageResult.pageIndex,
-        disableOtherButton: false,
+        waitGettingIngredients: false,
       ));
     } else {
       // get the first 10 items by category
@@ -111,7 +110,7 @@ class CookingBloc extends BaseBloc<CookingState> {
         ingredients: ingredients,
         hasNext: true,
         pageIndex: 1,
-        disableOtherButton: false,
+        waitGettingIngredients: false,
       ));
     }
   }

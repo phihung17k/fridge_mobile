@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../../blocs/bloc_provider.dart';
 import '../../blocs/cooking/cooking_bloc.dart';
@@ -41,14 +40,17 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<(List<SelectableIngredientModel>, bool)>(
-      stream: bloc?.ingredientsAndLoadmoreStream,
+    return StreamBuilder<(List<SelectableIngredientModel>, bool, bool)>(
+      stream: bloc?.ingredients_waitGettingIngredients_loadmoreStream,
       builder: (context, snapshot) {
         // log("StreamBuilder<(List<IngredientModel>, bool)> ${snapshot.data}");
-        if (!snapshot.hasData || snapshot.data!.$1.isEmpty) {
+        if (!snapshot.hasData || snapshot.data!.$2) {
           return const Center(child: CircularProgressIndicator());
         }
         List<SelectableIngredientModel> ingredients = snapshot.data!.$1;
+        if (ingredients.isEmpty) {
+          return const Center(child: Text("No items available."));
+        }
         return SingleChildScrollView(
           controller: scrollController,
           child: Column(
@@ -100,7 +102,7 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
                   );
                 },
               ),
-              if (snapshot.hasData && snapshot.data?.$2 == true)
+              if (snapshot.hasData && snapshot.data?.$3 == true)
                 const Padding(
                   padding: EdgeInsets.all(10),
                   child: Center(child: CircularProgressIndicator()),
