@@ -76,7 +76,7 @@ class CookingBloc extends BaseBloc<CookingState> {
       });
 
       if (ingredientsPageResult == null) {
-        log("ingredientsPageResult == null");
+        // log("ingredientsPageResult == null");
         emit(state.copyWith(
           waitGettingIngredients: false,
         ));
@@ -133,21 +133,50 @@ class CookingBloc extends BaseBloc<CookingState> {
       )),
     );
 
-    if (ingredientsPageResult == null) {
+    if (ingredientsPageResult == null || ingredientsPageResult.items.isEmpty) {
       emit(state.copyWith(
         isLoadMore: false,
       ));
       return;
     }
 
-    List<SelectableIngredientModel> items = state.ingredients!.toList();
-    items.addAll(ingredientsPageResult.items);
+    // load more
+    // case All : category id = 0
+    // case specific category id
+    //  - call API to get new ingredient
+    //    + Error / empty: no change
+    //    + Have data: add data to map
+
+    // add ingredients by category id in map <id, ingredients>
+    Map<int, List<SelectableIngredientModel>?>? newMap = Map.from(state.categoryIngredientsMap!);
+    for (SelectableIngredientModel ingredient in ingredientsPageResult.items) {
+      newMap.putIfAbsent(ingredient.category!.id!, () => [])!.add(ingredient);
+    }
+
+    List<SelectableIngredientModel> ingredients = [];
+    if (state.selectedCategoryId != 0) {
+      ingredients = newMap[state.selectedCategoryId]!;
+    } else {
+      ingredients = newMap.values.fold<List<SelectableIngredientModel>>(
+          [], (previousValue, element) => previousValue + element!);
+    }
+
     emit(state.copyWith(
-      ingredients: items,
+      categoryIngredientsMap: newMap,
+      ingredients: ingredients,
       hasNext: ingredientsPageResult.hasNext,
       pageIndex: ingredientsPageResult.pageIndex,
       isLoadMore: false,
     ));
+
+    // List<SelectableIngredientModel> items = state.ingredients!.toList();
+    // items.addAll(ingredientsPageResult.items);
+    // emit(state.copyWith(
+    //   ingredients: items,
+    //   hasNext: ingredientsPageResult.hasNext,
+    //   pageIndex: ingredientsPageResult.pageIndex,
+    //   isLoadMore: false,
+    // ));
   }
 
   void selectIngredient(int index) {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import '../../blocs/bloc_provider.dart';
 import '../../blocs/cooking/cooking_bloc.dart';
@@ -51,6 +53,7 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
         if (ingredients.isEmpty) {
           return const Center(child: Text("No items available."));
         }
+        log("LENGTH ${ingredients.length}");
         return SingleChildScrollView(
           controller: scrollController,
           child: Column(
