@@ -1,17 +1,15 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'dart:developer';
-
 import 'package:fridge_mobile/blocs/base_bloc.dart';
 import 'package:fridge_mobile/data/models/selectable_ingredient_model.dart';
 import 'package:fridge_mobile/data/models/selectable_ingredient_model_wrapper.dart';
 import 'package:fridge_mobile/data/request/ingredient_paging_request.dart';
 import 'package:fridge_mobile/data/services/category/i_category_service.dart';
 import 'package:fridge_mobile/data/services/ingredient/i_ingredient_service.dart';
-import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import '../../data/models/category_model.dart';
 import '../../data/paging_result.dart';
+import '../../pages/cooking/ingredients_in_category.dart';
 import 'cooking_state.dart';
 
 class CookingBloc extends BaseBloc<CookingState> {
@@ -59,8 +57,6 @@ class CookingBloc extends BaseBloc<CookingState> {
     categoryId ??= 0;
     emit(state.copyWith(
       ingredients: [],
-      // hasNext: false,
-      // pageIndex: 1,
       selectedCategoryId: categoryId,
       waitGettingIngredients: true,
     ));
@@ -68,17 +64,13 @@ class CookingBloc extends BaseBloc<CookingState> {
     PagingResult<SelectableIngredientModel>? ingredientsPageResult;
     // case category is exist in map
     if (state.categoryIngredientsMap!.containsKey(categoryId)) {
-      // get the first 10 items by category
-      // List<SelectableIngredientModel> ingredients =
-      //     state.categoryIngredientsMap![categoryId]!.ingredients!.take(10).toList();
-
       emit(state.copyWith(
         ingredients: state.categoryIngredientsMap![categoryId]!.ingredients,
-        // hasNext: true,
-        // pageIndex: 1,
         waitGettingIngredients: false,
       ));
 
+      IngredientsInCategory.eventBus
+          .fire(state.categoryIngredientsMap![categoryId]!.scrollPosition);
       return;
     }
 
@@ -89,7 +81,6 @@ class CookingBloc extends BaseBloc<CookingState> {
     });
 
     if (ingredientsPageResult == null) {
-      // log("ingredientsPageResult == null");
       emit(state.copyWith(
         waitGettingIngredients: false,
       ));
@@ -98,28 +89,16 @@ class CookingBloc extends BaseBloc<CookingState> {
 
     // add ingredients by category id in map
     Map<int, SelectableIngredientModelWrapper?>? newMap = Map.from(state.categoryIngredientsMap!);
-    // if (newMap.containsKey(categoryId)) {
-    //   SelectableIngredientModelWrapper wrapper = newMap[categoryId]!;
-    //   newMap[categoryId] = wrapper.copyWith(
-    //     ingredients: wrapper.ingredients! + ingredientsPageResult.items,
-    //     hasNext: ingredientsPageResult.hasNext,
-    //     pageIndex: ingredientsPageResult.pageIndex,
-    //   );
-    // } else {
     newMap[categoryId] = SelectableIngredientModelWrapper(
-      // categoryId: categoryId,
       ingredients: ingredientsPageResult.items,
       hasNext: ingredientsPageResult.hasNext,
       pageIndex: ingredientsPageResult.pageIndex,
       scrollPosition: 0,
     );
-    // }
 
     emit(state.copyWith(
       categoryIngredientsMap: newMap,
       ingredients: newMap[categoryId]!.ingredients,
-      // hasNext: ingredientsPageResult.hasNext,
-      // pageIndex: ingredientsPageResult.pageIndex,
       waitGettingIngredients: false,
     ));
   }
@@ -158,11 +137,8 @@ class CookingBloc extends BaseBloc<CookingState> {
     //    + Error / empty: no change
     //    + Have data: add data to map
 
-    // add ingredients by category id in map <id, ingredients>
+    // add ingredients by category id in map
     Map<int, SelectableIngredientModelWrapper?>? newMap = Map.from(state.categoryIngredientsMap!);
-    // for (SelectableIngredientModel ingredient in ingredientsPageResult.items) {
-    //   newMap.putIfAbsent(ingredient.category!.id!, () => [])!.add(ingredient);
-    // }
 
     newMap[state.selectedCategoryId!] = wrapper.copyWith(
       ingredients: wrapper.ingredients! + ingredientsPageResult.items,
@@ -182,5 +158,14 @@ class CookingBloc extends BaseBloc<CookingState> {
     SelectableIngredientModel ingredient = items[index];
     items[index] = ingredient.copyWith(isSelected: !ingredient.isSelected);
     emit(state.copyWith(ingredients: items));
+  }
+
+  void updateScrollPosition(double position) {
+    SelectableIngredientModelWrapper wrapper =
+        state.categoryIngredientsMap![state.selectedCategoryId!]!;
+    wrapper = wrapper.copyWith(
+      scrollPosition: position,
+    );
+    state.categoryIngredientsMap![state.selectedCategoryId!] = wrapper;
   }
 }

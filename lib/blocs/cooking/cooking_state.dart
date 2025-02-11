@@ -11,20 +11,18 @@ class CookingState extends Equatable {
   final Map<int, SelectableIngredientModelWrapper?>? categoryIngredientsMap;
   final List<SelectableIngredientModel>? ingredients;
   final int? selectedCategoryId;
-  // final bool? hasNext;
-  // final int? pageIndex;
   final bool? isLoadMore;
   final bool? waitGettingIngredients;
+  final double? scrollPosition;
 
   const CookingState({
     this.categories,
     this.categoryIngredientsMap,
     this.ingredients,
     this.selectedCategoryId,
-    // this.hasNext,
-    // this.pageIndex,
     this.isLoadMore,
     this.waitGettingIngredients,
+    this.scrollPosition,
   });
 
   CookingState.empty()
@@ -32,30 +30,27 @@ class CookingState extends Equatable {
         categoryIngredientsMap = {},
         ingredients = [],
         selectedCategoryId = 0, // All
-        // hasNext = false,
-        // pageIndex = 1,
         isLoadMore = false,
-        waitGettingIngredients = false;
+        waitGettingIngredients = false,
+        scrollPosition = 0;
 
   CookingState copyWith({
     List<CategoryModel>? categories,
     Map<int, SelectableIngredientModelWrapper?>? categoryIngredientsMap,
     List<SelectableIngredientModel>? ingredients,
     int? selectedCategoryId,
-    bool? hasNext,
-    int? pageIndex,
     bool? isLoadMore,
     bool? waitGettingIngredients,
+    double? scrollPosition,
   }) {
     return CookingState(
       categories: categories ?? this.categories,
       categoryIngredientsMap: categoryIngredientsMap ?? this.categoryIngredientsMap,
       ingredients: ingredients ?? this.ingredients,
       selectedCategoryId: selectedCategoryId ?? this.selectedCategoryId,
-      // hasNext: hasNext ?? this.hasNext,
-      // pageIndex: pageIndex ?? this.pageIndex,
       isLoadMore: isLoadMore ?? this.isLoadMore,
       waitGettingIngredients: waitGettingIngredients ?? this.waitGettingIngredients,
+      scrollPosition: scrollPosition ?? this.scrollPosition,
     );
   }
 
@@ -65,9 +60,8 @@ class CookingState extends Equatable {
         ingredients,
         categoryIngredientsMap,
         selectedCategoryId,
-        // hasNext,
-        // pageIndex,
         isLoadMore,
         waitGettingIngredients,
+        scrollPosition,
       ];
 }

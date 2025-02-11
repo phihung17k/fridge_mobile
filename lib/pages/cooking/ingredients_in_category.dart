@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:event_bus/event_bus.dart';
 import 'package:flutter/material.dart';
 import '../../blocs/bloc_provider.dart';
 import '../../blocs/cooking/cooking_bloc.dart';
 import '../../data/models/selectable_ingredient_model.dart';
 
 class IngredientsInCategory extends StatefulWidget {
+  static final EventBus eventBus = EventBus();
   const IngredientsInCategory({super.key});
 
   @override
@@ -15,6 +18,8 @@ class IngredientsInCategory extends StatefulWidget {
 class _IngredientsInCategoryState extends State<IngredientsInCategory> {
   late final ScrollController scrollController;
   late CookingBloc? bloc;
+  StreamSubscription? eventBusSubscription;
+  Timer? debounceTime;
 
   @override
   void initState() {
@@ -23,21 +28,29 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
 
     scrollController.addListener(
       () {
+        debounceTime = Timer(const Duration(milliseconds: 500), () {
+          if (scrollController.hasClients) {
+            bloc?.updateScrollPosition(scrollController.offset);
+          }
+        });
+
         if (scrollController.position.pixels >= scrollController.position.maxScrollExtent) {
-          // bloc!.state.selectedCategoryId == null
-          //     ? bloc?.getIngredients()
-          //     : bloc?.loadMoreIngredientsByCategoryId();
           bloc?.loadMoreIngredients();
         }
       },
     );
+
+    eventBusSubscription = IngredientsInCategory.eventBus.on().listen((data) {
+      if (scrollController.hasClients) {
+        scrollController.jumpTo(data);
+      }
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     bloc = BlocProvider.maybeOf<CookingBloc>(context)!;
-    // bloc?.getIngredients(pageIndex: 1);
   }
 
   @override
@@ -120,6 +133,7 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
   @override
   void dispose() {
     scrollController.dispose();
+    eventBusSubscription?.cancel();
     super.dispose();
   }
 }
