@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selectable_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selectable_ingredient_model_wrapper.dart';
 
 import '../../data/models/category_model.dart';
 
@@ -7,11 +8,11 @@ class CookingState extends Equatable {
   // selectCategoryId = 0 => All
 
   final List<CategoryModel>? categories;
-  final Map<int, List<SelectableIngredientModel>?>? categoryIngredientsMap;
+  final Map<int, SelectableIngredientModelWrapper?>? categoryIngredientsMap;
   final List<SelectableIngredientModel>? ingredients;
   final int? selectedCategoryId;
-  final bool? hasNext;
-  final int? pageIndex;
+  // final bool? hasNext;
+  // final int? pageIndex;
   final bool? isLoadMore;
   final bool? waitGettingIngredients;
 
@@ -20,8 +21,8 @@ class CookingState extends Equatable {
     this.categoryIngredientsMap,
     this.ingredients,
     this.selectedCategoryId,
-    this.hasNext,
-    this.pageIndex,
+    // this.hasNext,
+    // this.pageIndex,
     this.isLoadMore,
     this.waitGettingIngredients,
   });
@@ -31,14 +32,14 @@ class CookingState extends Equatable {
         categoryIngredientsMap = {},
         ingredients = [],
         selectedCategoryId = 0, // All
-        hasNext = false,
-        pageIndex = 1,
+        // hasNext = false,
+        // pageIndex = 1,
         isLoadMore = false,
         waitGettingIngredients = false;
 
   CookingState copyWith({
     List<CategoryModel>? categories,
-    Map<int, List<SelectableIngredientModel>?>? categoryIngredientsMap,
+    Map<int, SelectableIngredientModelWrapper?>? categoryIngredientsMap,
     List<SelectableIngredientModel>? ingredients,
     int? selectedCategoryId,
     bool? hasNext,
@@ -51,8 +52,8 @@ class CookingState extends Equatable {
       categoryIngredientsMap: categoryIngredientsMap ?? this.categoryIngredientsMap,
       ingredients: ingredients ?? this.ingredients,
       selectedCategoryId: selectedCategoryId ?? this.selectedCategoryId,
-      hasNext: hasNext ?? this.hasNext,
-      pageIndex: pageIndex ?? this.pageIndex,
+      // hasNext: hasNext ?? this.hasNext,
+      // pageIndex: pageIndex ?? this.pageIndex,
       isLoadMore: isLoadMore ?? this.isLoadMore,
       waitGettingIngredients: waitGettingIngredients ?? this.waitGettingIngredients,
     );
@@ -64,8 +65,8 @@ class CookingState extends Equatable {
         ingredients,
         categoryIngredientsMap,
         selectedCategoryId,
-        hasNext,
-        pageIndex,
+        // hasNext,
+        // pageIndex,
         isLoadMore,
         waitGettingIngredients,
       ];

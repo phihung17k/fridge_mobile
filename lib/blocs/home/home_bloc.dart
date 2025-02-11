@@ -1,7 +1,7 @@
 import 'package:fridge_mobile/blocs/base_bloc.dart';
 import 'package:fridge_mobile/blocs/home/home_state.dart';
 import 'package:fridge_mobile/data/dump.dart';
-import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selectable_ingredient_model.dart';
 
 class HomeBloc extends BaseBloc<HomeState> {
   HomeBloc()

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selectable_ingredient_model.dart';
 
 import '../../../blocs/bloc_provider.dart';
 import '../../../blocs/home/home_bloc.dart';

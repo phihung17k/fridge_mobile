@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selectable_ingredient_model.dart';
 import 'package:fridge_mobile/data/models/recipe_form/step_model.dart';
 
 class RecipeFormModel extends Equatable {

@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../../blocs/bloc_provider.dart';
 import '../../blocs/cooking/cooking_bloc.dart';
-import '../../data/models/selected_ingredient_model.dart';
+import '../../data/models/selectable_ingredient_model.dart';
 
 class IngredientsInCategory extends StatefulWidget {
   const IngredientsInCategory({super.key});
@@ -53,7 +53,7 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
         if (ingredients.isEmpty) {
           return const Center(child: Text("No items available."));
         }
-        log("LENGTH ${ingredients.length}");
+        // log("LENGTH ${ingredients.length}");
         return SingleChildScrollView(
           controller: scrollController,
           child: Column(

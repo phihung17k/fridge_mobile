@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fridge_mobile/blocs/bloc_provider.dart';
 import 'package:fridge_mobile/blocs/home/home_bloc.dart';
 
-import '../../../data/models/selected_ingredient_model.dart';
+import '../../../data/models/selectable_ingredient_model.dart';
 
 class IngredientTextField extends StatelessWidget {
   IngredientTextField({super.key});

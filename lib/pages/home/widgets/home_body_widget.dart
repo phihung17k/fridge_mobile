@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../blocs/bloc_provider.dart';
 import '../../../blocs/home/home_bloc.dart';
-import '../../../data/models/selected_ingredient_model.dart';
+import '../../../data/models/selectable_ingredient_model.dart';
 
 class HomeBodyWidget extends StatelessWidget {
   const HomeBodyWidget({super.key});

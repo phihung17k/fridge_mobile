@@ -5,7 +5,7 @@ import 'package:fridge_mobile/data/response/ingredient_response.dart';
 import 'package:fridge_mobile/data/services/ingredient/i_ingredient_service.dart';
 import 'package:fridge_mobile/data/models/ingredient_model.dart';
 
-import '../../models/selected_ingredient_model.dart';
+import '../../models/selectable_ingredient_model.dart';
 import '../../paging_result.dart';
 
 class IngredientService implements IIngredientService {

@@ -1,5 +1,5 @@
 import 'package:fridge_mobile/data/models/ingredient_model.dart';
-import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selectable_ingredient_model.dart';
 import 'package:fridge_mobile/data/request/ingredient_paging_request.dart';
 
 import '../../paging_result.dart';

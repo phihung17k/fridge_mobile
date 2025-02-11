@@ -3,7 +3,8 @@
 import 'dart:developer';
 
 import 'package:fridge_mobile/blocs/base_bloc.dart';
-import 'package:fridge_mobile/data/models/selected_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selectable_ingredient_model.dart';
+import 'package:fridge_mobile/data/models/selectable_ingredient_model_wrapper.dart';
 import 'package:fridge_mobile/data/request/ingredient_paging_request.dart';
 import 'package:fridge_mobile/data/services/category/i_category_service.dart';
 import 'package:fridge_mobile/data/services/ingredient/i_ingredient_service.dart';
@@ -58,66 +59,76 @@ class CookingBloc extends BaseBloc<CookingState> {
     categoryId ??= 0;
     emit(state.copyWith(
       ingredients: [],
-      hasNext: false,
-      pageIndex: 1,
+      // hasNext: false,
+      // pageIndex: 1,
       selectedCategoryId: categoryId,
       waitGettingIngredients: true,
     ));
 
     PagingResult<SelectableIngredientModel>? ingredientsPageResult;
-    // case category is NOT exist in map OR category id != 0
-    bool isNotExistedCategory =
-        categoryId != 0 && !state.categoryIngredientsMap!.containsKey(categoryId);
-    if (state.categoryIngredientsMap!.isEmpty || isNotExistedCategory) {
-      // call API
-      ingredientsPageResult = await Future.delayed(const Duration(seconds: 1), () {
-        return ingredientService
-            .getSelectableIngredients(IngredientPagingRequest(categoryId: categoryId));
-      });
-
-      if (ingredientsPageResult == null) {
-        // log("ingredientsPageResult == null");
-        emit(state.copyWith(
-          waitGettingIngredients: false,
-        ));
-        return;
-      }
-
-      // add ingredients by category id in map <id, ingredients>
-      Map<int, List<SelectableIngredientModel>?>? newMap = Map.from(state.categoryIngredientsMap!);
-      for (SelectableIngredientModel ingredient in ingredientsPageResult.items) {
-        newMap.putIfAbsent(ingredient.category!.id!, () => [])!.add(ingredient);
-      }
-
-      emit(state.copyWith(
-        categoryIngredientsMap: newMap,
-        ingredients: ingredientsPageResult.items,
-        hasNext: ingredientsPageResult.hasNext,
-        pageIndex: ingredientsPageResult.pageIndex,
-        waitGettingIngredients: false,
-      ));
-    } else {
+    // case category is exist in map
+    if (state.categoryIngredientsMap!.containsKey(categoryId)) {
       // get the first 10 items by category
-      // case category id = 0, get the first 10 items by category id = 1
-      List<SelectableIngredientModel> ingredients = categoryId == 0
-          ? state.categoryIngredientsMap!.values
-              .expand<SelectableIngredientModel>((element) => element!.toList())
-              .take(10)
-              .toList()
-          : state.categoryIngredientsMap![categoryId]!.take(10).toList();
+      // List<SelectableIngredientModel> ingredients =
+      //     state.categoryIngredientsMap![categoryId]!.ingredients!.take(10).toList();
 
       emit(state.copyWith(
-        ingredients: ingredients,
-        hasNext: true,
-        pageIndex: 1,
+        ingredients: state.categoryIngredientsMap![categoryId]!.ingredients,
+        // hasNext: true,
+        // pageIndex: 1,
         waitGettingIngredients: false,
       ));
+
+      return;
     }
+
+    // call API when category is NOT exist
+    ingredientsPageResult = await Future.delayed(const Duration(seconds: 1), () {
+      return ingredientService
+          .getSelectableIngredients(IngredientPagingRequest(categoryId: categoryId));
+    });
+
+    if (ingredientsPageResult == null) {
+      // log("ingredientsPageResult == null");
+      emit(state.copyWith(
+        waitGettingIngredients: false,
+      ));
+      return;
+    }
+
+    // add ingredients by category id in map
+    Map<int, SelectableIngredientModelWrapper?>? newMap = Map.from(state.categoryIngredientsMap!);
+    // if (newMap.containsKey(categoryId)) {
+    //   SelectableIngredientModelWrapper wrapper = newMap[categoryId]!;
+    //   newMap[categoryId] = wrapper.copyWith(
+    //     ingredients: wrapper.ingredients! + ingredientsPageResult.items,
+    //     hasNext: ingredientsPageResult.hasNext,
+    //     pageIndex: ingredientsPageResult.pageIndex,
+    //   );
+    // } else {
+    newMap[categoryId] = SelectableIngredientModelWrapper(
+      // categoryId: categoryId,
+      ingredients: ingredientsPageResult.items,
+      hasNext: ingredientsPageResult.hasNext,
+      pageIndex: ingredientsPageResult.pageIndex,
+      scrollPosition: 0,
+    );
+    // }
+
+    emit(state.copyWith(
+      categoryIngredientsMap: newMap,
+      ingredients: newMap[categoryId]!.ingredients,
+      // hasNext: ingredientsPageResult.hasNext,
+      // pageIndex: ingredientsPageResult.pageIndex,
+      waitGettingIngredients: false,
+    ));
   }
 
   /// get ingredient with page index
   void loadMoreIngredients() async {
-    if (state.hasNext == false) {
+    SelectableIngredientModelWrapper wrapper =
+        state.categoryIngredientsMap![state.selectedCategoryId]!;
+    if (wrapper.hasNext == false) {
       return;
     }
     // log("LOAD MORE - current page index: ${state.pageIndex}");
@@ -128,7 +139,7 @@ class CookingBloc extends BaseBloc<CookingState> {
     PagingResult<SelectableIngredientModel>? ingredientsPageResult = await Future.delayed(
       const Duration(seconds: 1),
       () => ingredientService.getSelectableIngredients(IngredientPagingRequest(
-        pageIndex: state.pageIndex! + 1,
+        pageIndex: wrapper.pageIndex! + 1,
         categoryId: state.selectedCategoryId,
       )),
     );
@@ -148,35 +159,22 @@ class CookingBloc extends BaseBloc<CookingState> {
     //    + Have data: add data to map
 
     // add ingredients by category id in map <id, ingredients>
-    Map<int, List<SelectableIngredientModel>?>? newMap = Map.from(state.categoryIngredientsMap!);
-    for (SelectableIngredientModel ingredient in ingredientsPageResult.items) {
-      newMap.putIfAbsent(ingredient.category!.id!, () => [])!.add(ingredient);
-    }
+    Map<int, SelectableIngredientModelWrapper?>? newMap = Map.from(state.categoryIngredientsMap!);
+    // for (SelectableIngredientModel ingredient in ingredientsPageResult.items) {
+    //   newMap.putIfAbsent(ingredient.category!.id!, () => [])!.add(ingredient);
+    // }
 
-    List<SelectableIngredientModel> ingredients = [];
-    if (state.selectedCategoryId != 0) {
-      ingredients = newMap[state.selectedCategoryId]!;
-    } else {
-      ingredients = newMap.values.fold<List<SelectableIngredientModel>>(
-          [], (previousValue, element) => previousValue + element!);
-    }
+    newMap[state.selectedCategoryId!] = wrapper.copyWith(
+      ingredients: wrapper.ingredients! + ingredientsPageResult.items,
+      hasNext: ingredientsPageResult.hasNext,
+      pageIndex: ingredientsPageResult.pageIndex,
+    );
 
     emit(state.copyWith(
       categoryIngredientsMap: newMap,
-      ingredients: ingredients,
-      hasNext: ingredientsPageResult.hasNext,
-      pageIndex: ingredientsPageResult.pageIndex,
+      ingredients: newMap[state.selectedCategoryId!]!.ingredients,
       isLoadMore: false,
     ));
-
-    // List<SelectableIngredientModel> items = state.ingredients!.toList();
-    // items.addAll(ingredientsPageResult.items);
-    // emit(state.copyWith(
-    //   ingredients: items,
-    //   hasNext: ingredientsPageResult.hasNext,
-    //   pageIndex: ingredientsPageResult.pageIndex,
-    //   isLoadMore: false,
-    // ));
   }
 
   void selectIngredient(int index) {
