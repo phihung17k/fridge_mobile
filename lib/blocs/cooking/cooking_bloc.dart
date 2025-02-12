@@ -53,6 +53,23 @@ class CookingBloc extends BaseBloc<CookingState> {
     emit(state.copyWith(categories: categories ?? []));
   }
 
+  /// flow
+  /// at the first time on screen, pick All category (id = 0)
+  /// call api at All category, return list of ingredients and add them to All and categories
+  ///
+  /// when pick other category, check if category has ingredients in map, find page index
+  /// case number of ingredients % page size > 0
+  /// calculate page index = ceiling (number of ingredients / page size)
+  /// ex: page size = 10, number of ingredients = 5 => call API by page index = 1
+  /// ex: page size = 10, number of ingredients = 14 => call API by page index = 2
+  /// case number of ingredients % page size == 0
+  /// calculate page index = (number of ingredients / page size) + 1
+  /// ex: page size = 10, number of ingredients = 10 => call API by page index = 2
+  /// call API at the category, return list of ingredients and add them to category and All
+  ///
+  /// when pick All category back, check hasNext in category id from 1 to end
+  /// if
+
   /// get ingredient at the first time trigger cooking page
   void getIngredientsWithCategory({int? categoryId}) async {
     // case categoryId is not inputted, call ingredient for all categories
