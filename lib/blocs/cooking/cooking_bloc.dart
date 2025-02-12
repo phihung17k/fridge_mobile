@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:developer';
+
 import 'package:fridge_mobile/blocs/base_bloc.dart';
 import 'package:fridge_mobile/data/models/selectable_ingredient_model.dart';
 import 'package:fridge_mobile/data/models/selectable_ingredient_model_wrapper.dart';
@@ -110,7 +112,7 @@ class CookingBloc extends BaseBloc<CookingState> {
     if (wrapper.hasNext == false) {
       return;
     }
-    // log("LOAD MORE - current page index: ${state.pageIndex}");
+
     emit(state.copyWith(
       isLoadMore: true,
     ));
@@ -131,8 +133,6 @@ class CookingBloc extends BaseBloc<CookingState> {
     }
 
     // load more
-    // case All : category id = 0
-    // case specific category id
     //  - call API to get new ingredient
     //    + Error / empty: no change
     //    + Have data: add data to map
@@ -154,10 +154,28 @@ class CookingBloc extends BaseBloc<CookingState> {
   }
 
   void selectIngredient(int index) {
-    List<SelectableIngredientModel> items = state.ingredients!.toList();
-    SelectableIngredientModel ingredient = items[index];
-    items[index] = ingredient.copyWith(isSelected: !ingredient.isSelected);
-    emit(state.copyWith(ingredients: items));
+    // SelectableIngredientModel ingredient =
+    //     state.categoryIngredientsMap![state.selectedCategoryId]!.ingredients![index];
+    // SelectableIngredientModel updatedIngredient =
+    //     ingredient.copyWith(isSelected: !ingredient.isSelected);
+
+    // state.categoryIngredientsMap![state.selectedCategoryId]!.ingredients![index] =
+    //     updatedIngredient;
+
+    // if (state.selectedCategoryId == 0) {
+    //   // int categoryId = ingredient.category!.id!;
+    //   // state.categoryIngredientsMap![categoryId]!.ingredients![index] = updatedIngredient;
+    // } else {
+    //   // get ingredient by ingredient id to update selection
+    //   int indexIngredientCateAll = state.categoryIngredientsMap![0]!.ingredients!
+    //       .indexWhere((item) => item.id == ingredient.id);
+    //   state.categoryIngredientsMap![0]!.ingredients![indexIngredientCateAll] = updatedIngredient;
+    //   // log("state.selectedCategoryId ${state.selectedCategoryId} - ${state.categoryIngredientsMap![state.selectedCategoryId]!.ingredients![index].isSelected}");
+    //   // log("state.selectedCategoryId ${0} - ${state.categoryIngredientsMap![0]!.ingredients![indexIngredientCateAll].isSelected}");
+    // }
+
+    emit(state.copyWith(
+        ingredients: state.categoryIngredientsMap![state.selectedCategoryId]!.ingredients));
   }
 
   void updateScrollPosition(double position) {

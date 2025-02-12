@@ -28,7 +28,8 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
 
     scrollController.addListener(
       () {
-        debounceTime = Timer(const Duration(milliseconds: 500), () {
+        debounceTime?.cancel();
+        debounceTime = Timer(const Duration(milliseconds: 300), () {
           if (scrollController.hasClients) {
             bloc?.updateScrollPosition(scrollController.offset);
           }
@@ -41,9 +42,13 @@ class _IngredientsInCategoryState extends State<IngredientsInCategory> {
     );
 
     eventBusSubscription = IngredientsInCategory.eventBus.on().listen((data) {
-      if (scrollController.hasClients) {
-        scrollController.jumpTo(data);
-      }
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) {
+          if (scrollController.hasClients) {
+            scrollController.jumpTo(data);
+          }
+        },
+      );
     });
   }
 
